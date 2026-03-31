@@ -3,6 +3,7 @@ import Layout from '@/layouts/Layout.astro';
 import Header from '@/components/Header.astro';
 import Footer from '@/components/Footer.astro';
 import { races, getUpcomingRaces, getFinishedRaces, getG1Races, type Race } from '@/data/races';
+import { asset } from '@/utils/asset';
 
 const upcoming = getUpcomingRaces();
 const finished = getFinishedRaces();
@@ -49,7 +50,7 @@ const tabs: { id: string; label: string; title: string; data: Race[]; empty: str
 
                   {/* Stadium image — flush top/bottom/left */}
                   <div class="race-item-image">
-                    <img src={race.image} alt={race.name} loading="lazy" />
+                    <img src={asset(race.image)} alt={race.name} loading="lazy" />
                     <span class={`grade-badge ${race.grade.toLowerCase()}`}>{race.grade}</span>
                     {race.status === 'finished' && <span class="finished-badge">✅ Selesai</span>}
                     {race.status === 'upcoming' && <span class="upcoming-badge">📅 Mendatang</span>}
@@ -57,7 +58,7 @@ const tabs: { id: string; label: string; title: string; data: Race[]; empty: str
                     {/* Mobile-only circular winner avatar overlaid on stadium image */}
                     {race.winner && race.winnerImage && (
                       <div class="winner-avatar-mobile">
-                        <img src={race.winnerImage} alt={race.winner} loading="lazy" />
+                        <img src={asset(race.winnerImage)} alt={race.winner} loading="lazy" />
                         <span class="winner-avatar-crown">🏆</span>
                       </div>
                     )}
@@ -89,7 +90,7 @@ const tabs: { id: string; label: string; title: string; data: Race[]; empty: str
                   {race.winner && (
                     <div class="race-winner-portrait">
                       {race.winnerImage
-                        ? <img src={race.winnerImage} alt={race.winner} loading="lazy" />
+                        ? <img src={asset(race.winnerImage)} alt={race.winner} loading="lazy" />
                         : <div class="winner-portrait-placeholder">🏇</div>
                       }
                       <div class="winner-portrait-label">
@@ -116,7 +117,7 @@ const tabs: { id: string; label: string; title: string; data: Race[]; empty: str
 <style>
   .page-header {
     position: relative;
-    background-image: url('/bg-silver-paint.jpeg');
+    background-image: url('/kudayu/bg-silver-paint.jpeg');
     background-size: cover;
     background-position: center;
     padding: var(--spacing-xl) 0;

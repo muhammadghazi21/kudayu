@@ -9,6 +9,7 @@ import { getFeaturedHorses, getTopWinners } from '@/data/horses';
 import { getUpcomingRaces, getFinishedRaces } from '@/data/races';
 import { getFeaturedNews } from '@/data/news';
 import { getHomePreviews } from '@/data/community';
+import { asset } from '@/utils/asset';
 
 const featuredHorses = getFeaturedHorses();
 const topWinners = getTopWinners(3);
@@ -99,7 +100,7 @@ const totalEvents   = (await import('@/data/community')).communityEvents.length;
           {featuredHorses.map((horse, index) => (
             <a href={`/horses/${horse.slug}`} class="showcase-item" data-index={index}>
               <div class="showcase-image">
-                <img src={horse.image} alt={horse.name} loading="lazy" />
+                <img src={asset(horse.image)} alt={horse.name} loading="lazy" />
                 <div class="showcase-overlay"></div>
               </div>
               <div class="showcase-content">
@@ -236,7 +237,7 @@ const totalEvents   = (await import('@/data/community')).communityEvents.length;
           {communityEvents.map((ev) => (
             <a href={`/community/${ev.slug}`} class="community-card-link">
             <article class="community-card">
-              <img src={ev.image} alt={ev.title} class="community-card-img" loading="lazy" />
+              <img src={asset(ev.image)} alt={ev.title} class="community-card-img" loading="lazy" />
               <div class="community-card-overlay">
                 <span class={`community-tag ${ev.tagClass}`}>{ev.tag}</span>
                 <h3 class="community-card-title">{ev.title}</h3>
@@ -266,7 +267,7 @@ const totalEvents   = (await import('@/data/community')).communityEvents.length;
               <div class="timeline-marker"></div>
               <div class="timeline-content">
                 <div class="timeline-image">
-                  <img src={article.image} alt={article.title} loading="lazy" />
+                  <img src={asset(article.image)} alt={article.title} loading="lazy" />
                 </div>
                 <div class="timeline-text">
                   <span class="timeline-category">{article.category}</span>
@@ -308,7 +309,7 @@ const totalEvents   = (await import('@/data/community')).communityEvents.length;
                 {index === 0 && <span class="crown">👑</span>}
               </div>
               <div class="podium-image">
-                <img src={horse.image} alt={horse.name} loading="lazy" />
+                <img src={asset(horse.image)} alt={horse.name} loading="lazy" />
                 <div class="podium-glow"></div>
               </div>
               <div class="podium-info">
@@ -742,7 +743,7 @@ const totalEvents   = (await import('@/data/community')).communityEvents.length;
     position: absolute;
     width: 60px;
     height: 60px;
-    background-image: url('/double-star.svg');
+    background-image: url('/kudayu/double-star.svg');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;

@@ -3,6 +3,7 @@ import Layout from '@/layouts/Layout.astro';
 import Header from '@/components/Header.astro';
 import Footer from '@/components/Footer.astro';
 import { news, getRecentNews, getNewsByCategory } from '@/data/news';
+import { asset } from '@/utils/asset';
 
 const allNews = news;
 const categories = ['news', 'analysis', 'interview', 'event'];
@@ -28,7 +29,7 @@ const categories = ['news', 'analysis', 'interview', 'event'];
         <div class="container">
             {allNews.filter(n => n.featured).slice(0, 1).map(article => (
               <article class="featured-main card">
-                <img src={article.image} alt={article.title} loading="lazy" />
+                <img src={asset(article.image)} alt={article.title} loading="lazy" />
                 <div class="featured-content">
                   <span class={`category-badge ${article.category}`}>{article.category}</span>
                   <h2>{article.title}</h2>
@@ -66,7 +67,7 @@ const categories = ['news', 'analysis', 'interview', 'event'];
           {allNews.map(article => (
             <article class="news-card card" data-category={article.category}>
               <div class="news-image">
-                <img src={article.image} alt={article.title} loading="lazy" />
+                <img src={asset(article.image)} alt={article.title} loading="lazy" />
                 {article.featured && (
                   <span class="featured-badge">⭐ Featured</span>
                 )}
@@ -98,7 +99,7 @@ const categories = ['news', 'analysis', 'interview', 'event'];
 <style>
   .page-header {
     position: relative;
-    background-image: url('/bg-silver-paint.jpeg');
+    background-image: url('/kudayu/bg-silver-paint.jpeg');
     background-size: cover;
     background-position: center;
     padding: var(--spacing-xl) 0;

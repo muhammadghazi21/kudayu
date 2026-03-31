@@ -3,6 +3,7 @@ import Layout from '@/layouts/Layout.astro';
 import Header from '@/components/Header.astro';
 import Footer from '@/components/Footer.astro';
 import { galleryItems } from '@/data/gallery';
+import { asset } from '@/utils/asset';
 ---
 
 <Layout
@@ -45,12 +46,12 @@ import { galleryItems } from '@/data/gallery';
               class="insta-cell"
               data-type={item.type}
               data-index={idx}
-              data-src={item.src}
+              data-src={asset(item.src)}
               data-alt={item.alt}
               data-label={item.label}
             >
               <img
-                src={'thumbnail' in item && item.thumbnail ? item.thumbnail : item.src}
+                src={'thumbnail' in item && item.thumbnail ? asset(item.thumbnail) : asset(item.src)}
                 alt={item.alt}
                 loading="lazy"
                 draggable="false"
@@ -95,7 +96,7 @@ import { galleryItems } from '@/data/gallery';
   /* ── Page header ── */
   .page-header {
     position: relative;
-    background-image: url('/bg-silver-paint.jpeg');
+    background-image: url('/kudayu/bg-silver-paint.jpeg');
     background-size: cover;
     background-position: center;
     padding: var(--spacing-xl) 0;

@@ -1,4 +1,5 @@
 ---
+import { asset } from '@/utils/asset';
 interface GalleryItem {
   type: 'image' | 'video';
   src: string;
@@ -19,7 +20,7 @@ const { items, columns = 3 } = Astro.props;
     <div class="gallery-item" data-index={index}>
       {item.type === 'image' ? (
         <img 
-          src={item.src} 
+          src={asset(item.src)} 
           alt={item.alt} 
           loading="lazy"
           class="gallery-image"
@@ -27,7 +28,7 @@ const { items, columns = 3 } = Astro.props;
       ) : (
         <div class="gallery-video">
           <img 
-            src={item.thumbnail || item.src} 
+            src={asset(item.thumbnail || item.src)} 
             alt={item.alt}
             loading="lazy"
           />

@@ -10,6 +10,7 @@ import {
   type EventStatus,
   type EventMode,
 } from '@/data/community';
+import { asset } from '@/utils/asset';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const _deprecatedInlineData = [
@@ -232,7 +233,7 @@ const modeLabel = {
               <a href={`/community/${ev.slug}`} class="event-card-link">
               <article class="event-card">
                 <div class="event-card-img">
-                  <img src={ev.image} alt={ev.title} loading="lazy" />
+                  <img src={asset(ev.image)} alt={ev.title} loading="lazy" />
                   <div class="event-card-img-overlay"></div>
                   <!-- category + mode badges -->
                   <div class="event-badges-top">
@@ -290,7 +291,7 @@ const modeLabel = {
               <article class="online-card">
                 <div class="online-card-accent" style={`background:${ev.categoryColor}`}></div>
                 <div class="online-card-img">
-                  <img src={ev.image} alt={ev.title} loading="lazy" />
+                  <img src={asset(ev.image)} alt={ev.title} loading="lazy" />
                 </div>
                 <div class="online-card-body">
                   <div class="online-card-top">

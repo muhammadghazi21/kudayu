@@ -3,6 +3,7 @@ import Layout from '@/layouts/Layout.astro';
 import Header from '@/components/Header.astro';
 import Footer from '@/components/Footer.astro';
 import { horses, getHorseBySlug } from '@/data/horses';
+import { asset } from '@/utils/asset';
 
 export async function getStaticPaths() {
   return horses.map(horse => ({
@@ -29,7 +30,7 @@ if (!horse) {
     <!-- Hero Section -->
     <section class="horse-hero">
       <div class="horse-hero-bg">
-        <img src={horse.image} alt={horse.name} />
+        <img src={asset(horse.image)} alt={horse.name} />
         <div class="overlay"></div>
       </div>
       <div class="container">
@@ -143,13 +144,13 @@ if (!horse) {
           <aside class="sidebar">
             <div class="card horse-img-card">
               <div class="horse-img-label">✨ Ilustrasi Karakter</div>
-              <img src={horse.image} alt={`Ilustrasi karakter ${horse.name}`} class="sidebar-image" />
+              <img src={asset(horse.image)} alt={`Ilustrasi karakter ${horse.name}`} class="sidebar-image" />
             </div>
 
             {horse.imageReal && (
               <div class="card horse-img-card">
                 <div class="horse-img-label">📷 Foto Kuda Asli</div>
-                <img src={horse.imageReal} alt={`Foto asli ${horse.name}`} class="sidebar-image" />
+                <img src={asset(horse.imageReal)} alt={`Foto asli ${horse.name}`} class="sidebar-image" />
               </div>
             )}
 
