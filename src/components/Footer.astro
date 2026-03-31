@@ -1,0 +1,316 @@
+---
+const currentYear = new Date().getFullYear();
+
+const footerLinks = {
+  'Informasi': [
+    { name: 'Tentang Kami', href: '/about' },
+    { name: 'Kontak', href: '/contact' },
+    { name: 'FAQ', href: '/faq' },
+  ],
+  'Konten': [
+    { name: 'Profil Kuda', href: '/horses' },
+    { name: 'Jadwal Race', href: '/races' },
+    { name: 'Berita', href: '/news' },
+    { name: 'Galeri', href: '/gallery' },
+  ],
+  'Legal': [
+    { name: 'Privacy Policy', href: '/privacy' },
+    { name: 'Terms of Service', href: '/terms' },
+  ],
+};
+
+const socialLinks = [
+  { name: 'Twitter', href: '#' },
+  { name: 'Instagram', href: '#' },
+  { name: 'YouTube', href: '#' },
+  { name: 'Discord', href: '#' },
+];
+---
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <a href="/" class="footer-logo">
+          <span class="logo-icon">🐴</span>
+          <span class="logo-text">KUDAYU</span>
+        </a>
+        <p class="footer-tagline">
+          Platform informasi pacuan kuda terlengkap di Indonesia. 
+          Ikuti perkembangan dunia pacuan kuda dan temukan favorit Anda!
+        </p>
+        <div class="social-links">
+          {socialLinks.map(social => (
+            <a 
+              href={social.href} 
+              class="social-link" 
+              aria-label={social.name}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {social.name}
+            </a>
+          ))}
+        </div>
+        <div class="contact-section">
+          <a href="mailto:crehirastudio@gmail.com" class="contact-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            <span class="contact-label">Contact Us</span>
+            <span class="contact-divider">·</span>
+            <span class="contact-address">crehirastudio@gmail.com</span>
+          </a>
+        </div>
+      </div>
+      
+      {Object.entries(footerLinks).map(([category, links]) => (
+        <div class="footer-section">
+          <h4 class="footer-title">{category}</h4>
+          <ul class="footer-links">
+            {links.map(link => (
+              <li>
+                <a href={link.href}>{link.name}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+    
+    <div class="footer-bottom">
+      <p>&copy; {currentYear} Kudayu. All rights reserved.</p>
+      <p class="footer-credit">
+        Made with ❤️ for Indonesian horse racing fans
+      </p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    background: linear-gradient(180deg, #FFFFFF 0%, #F8F8F8 100%);
+    border-top: 3px solid var(--primary);
+    margin-top: var(--spacing-2xl);
+    padding: var(--spacing-2xl) 0 var(--spacing-lg);
+    position: relative;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+  }
+  
+  .footer-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
+  }
+  
+  .footer-brand {
+    max-width: 350px;
+  }
+  
+  .footer-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.75rem;
+    font-weight: 900;
+    color: var(--text-primary);
+    text-decoration: none;
+    margin-bottom: var(--spacing-md);
+    transition: all var(--transition-fast);
+  }
+
+  .footer-logo:hover {
+    color: var(--primary);
+    transform: translateY(-2px);
+  }
+  
+  .footer-logo .logo-icon {
+    font-size: 2.25rem;
+    transition: transform var(--transition-fast);
+  }
+
+  .footer-logo:hover .logo-icon {
+    transform: scale(1.1) rotate(-5deg);
+  }
+  
+  .footer-tagline {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-md);
+    font-weight: 400;
+  }
+  
+  .social-links {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  
+  .social-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.35rem 0.85rem;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    transition: border-color var(--transition-fast), color var(--transition-fast);
+    background: transparent;
+    text-decoration: none;
+  }
+
+  .social-link:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+  
+  .contact-section {
+    margin-top: var(--spacing-md);
+  }
+
+  .contact-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: border-color var(--transition-fast), color var(--transition-fast);
+    background: transparent;
+    width: fit-content;
+    cursor: pointer;
+  }
+
+  .contact-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+
+  .contact-label {
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .contact-btn:hover .contact-label {
+    color: inherit;
+  }
+
+  .contact-divider {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+
+  .contact-address {
+    font-weight: 400;
+  }
+
+  .footer-title {
+    font-size: 1.1rem;
+    font-weight: 800;
+    margin-bottom: var(--spacing-md);
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    position: relative;
+    padding-bottom: 0.5rem;
+  }
+
+  .footer-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 40px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    border-radius: 2px;
+  }
+  
+  .footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .footer-links li {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .footer-links a {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    transition: all var(--transition-fast);
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    position: relative;
+    padding-left: 0;
+  }
+
+  .footer-links a::before {
+    content: '→';
+    opacity: 0;
+    margin-right: 0.5rem;
+    transition: all var(--transition-fast);
+    color: var(--primary);
+  }
+
+  .footer-links a:hover {
+    color: var(--primary);
+    padding-left: 1.5rem;
+  }
+
+  .footer-links a:hover::before {
+    opacity: 1;
+  }
+  
+  .footer-bottom {
+    padding-top: var(--spacing-lg);
+    border-top: 2px solid var(--border);
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-top: var(--spacing-xl);
+  }
+
+  .footer-credit {
+    margin-top: 0.5rem;
+    color: var(--text-secondary);
+  }
+  
+  @media (max-width: 1024px) {
+    .footer-content {
+      grid-template-columns: 1fr 1fr;
+    }
+    
+    .footer-brand {
+      grid-column: 1 / -1;
+      max-width: 100%;
+    }
+  }
+  
+  @media (max-width: 640px) {
+    .footer-content {
+      grid-template-columns: 1fr;
+    }
+    
+    .footer-section {
+      text-align: center;
+    }
+    
+    .social-links {
+      justify-content: center;
+    }
+  }
+</style>

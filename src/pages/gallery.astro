@@ -1,0 +1,365 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+import { galleryItems } from '@/data/gallery';
+---
+
+<Layout
+  title="Galeri"
+  description="Koleksi foto dan video spektakuler dari dunia pacuan kuda Indonesia."
+>
+  <Header />
+
+  <main>
+    <section class="page-header">
+      <div class="container">
+        <h1>🖼️ Galeri</h1>
+        <p>Fanart, foto, video dari semua hal tentang kuda Indonesia</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+
+        <!-- Filter bar -->
+        <div class="gallery-filter">
+          <button class="filter-btn active" data-filter="all">
+            <span class="filter-icon">⊞</span> Semua
+            <span class="filter-count">{galleryItems.length}</span>
+          </button>
+          <button class="filter-btn" data-filter="image">
+            <span class="filter-icon">📷</span> Foto
+            <span class="filter-count">{galleryItems.filter((i) => i.type === 'image').length}</span>
+          </button>
+          <button class="filter-btn" data-filter="video">
+            <span class="filter-icon">🎥</span> Video
+            <span class="filter-count">{galleryItems.filter((i) => i.type === 'video').length}</span>
+          </button>
+        </div>
+
+        <!-- Instagram-style dynamic grid -->
+        <div class="insta-grid" id="instaGrid">
+          {galleryItems.map((item, idx) => (
+            <div
+              class="insta-cell"
+              data-type={item.type}
+              data-index={idx}
+              data-src={item.src}
+              data-alt={item.alt}
+              data-label={item.label}
+            >
+              <img
+                src={'thumbnail' in item && item.thumbnail ? item.thumbnail : item.src}
+                alt={item.alt}
+                loading="lazy"
+                draggable="false"
+              />
+              <div class="cell-overlay">
+                {item.type === 'video' && (
+                  <div class="play-icon">
+                    <svg width="44" height="44" viewBox="0 0 44 44">
+                      <circle cx="22" cy="22" r="22" fill="rgba(220,20,60,0.88)" />
+                      <path d="M17 13L33 22L17 31V13Z" fill="white" />
+                    </svg>
+                  </div>
+                )}
+                <span class="cell-label">{item.label}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox" aria-hidden="true">
+    <button class="lb-close" id="lbClose" aria-label="Tutup">✕</button>
+    <button class="lb-nav lb-prev" id="lbPrev" aria-label="Sebelumnya">‹</button>
+    <button class="lb-nav lb-next" id="lbNext" aria-label="Berikutnya">›</button>
+    <div class="lb-inner">
+      <img class="lb-img" id="lbImg" src="" alt="" />
+      <div class="lb-caption">
+        <span class="lb-label" id="lbLabel"></span>
+        <span class="lb-counter" id="lbCounter"></span>
+      </div>
+    </div>
+  </div>
+
+  <Footer />
+</Layout>
+
+<style>
+  /* ── Page header ── */
+  .page-header {
+    position: relative;
+    background-image: url('/bg-silver-paint.jpeg');
+    background-size: cover;
+    background-position: center;
+    padding: var(--spacing-xl) 0;
+    text-align: center;
+    margin-bottom: 0;
+    overflow: hidden;
+  }
+  .page-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(220,20,60,0.65) 0%, rgba(30,10,10,0.75) 100%);
+    z-index: 0;
+  }
+  .page-header .container { position: relative; z-index: 1; }
+  .page-header h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    margin-bottom: var(--spacing-sm);
+    background: linear-gradient(90deg,#A8A8A8 0%,#D8D8D8 20%,#FFFFFF 38%,#F0F0F0 42%,#C0C0C0 55%,#E8E8E8 70%,#FFFFFF 82%,#B0B0B0 100%);
+    background-size: 300% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: glossySweep 10s linear infinite;
+  }
+  @keyframes glossySweep {
+    0%   { background-position: 0% center; }
+    100% { background-position: 300% center; }
+  }
+  .page-header p {
+    font-size: 1.1rem;
+    background: linear-gradient(90deg,#909090 0%,#C8C8C8 25%,#F5F5F5 45%,#C8C8C8 55%,#909090 100%);
+    background-size: 300% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: glossySweep 12s linear infinite;
+  }
+
+  /* ── Filter bar ── */
+  .gallery-filter {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-bottom: var(--spacing-lg);
+    flex-wrap: wrap;
+  }
+  .filter-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.55rem 1.2rem;
+    background: var(--bg-card);
+    border: 1.5px solid var(--border);
+    border-radius: 50px;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+  .filter-btn:hover { border-color: var(--primary); color: var(--text-primary); }
+  .filter-btn.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+  .filter-count {
+    background: rgba(255,255,255,0.22);
+    border-radius: 20px;
+    padding: 0.1rem 0.45rem;
+    font-size: 0.75rem;
+    color: inherit;
+  }
+
+  /* ── Instagram grid ── */
+  .insta-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-auto-flow: dense;
+    gap: 3px;
+  }
+  .insta-cell {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    cursor: pointer;
+    background: var(--bg-hover);
+  }
+
+  .insta-cell img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+  }
+  .insta-cell:hover img { transform: scale(1.07); }
+
+  .cell-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: background 0.22s ease, opacity 0.22s ease;
+    opacity: 0;
+  }
+  .insta-cell:hover .cell-overlay { background: rgba(0,0,0,0.42); opacity: 1; }
+  .play-icon { filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5)); }
+  .cell-label {
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.82rem;
+    letter-spacing: 0.03em;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.8);
+    padding: 0 0.75rem;
+    text-align: center;
+  }
+  .insta-cell.hidden { display: none; }
+
+  /* ── Lightbox ── */
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.92);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.22s ease;
+  }
+  .lightbox.open { opacity: 1; pointer-events: all; }
+
+  .lb-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: min(92vw, 860px);
+    max-height: 92vh;
+    gap: 0.75rem;
+  }
+  .lb-img {
+    max-width: 100%;
+    max-height: calc(92vh - 60px);
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 8px 48px rgba(0,0,0,0.6);
+    display: block;
+  }
+  .lb-caption {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    color: rgba(255,255,255,0.85);
+    font-size: 0.88rem;
+    gap: 1rem;
+  }
+  .lb-label { font-weight: 600; }
+  .lb-counter { color: rgba(255,255,255,0.5); font-size: 0.8rem; white-space: nowrap; }
+
+  .lb-close {
+    position: fixed;
+    top: 1.2rem; right: 1.4rem;
+    background: rgba(255,255,255,0.1);
+    border: none; color: #fff;
+    font-size: 1.4rem;
+    width: 2.4rem; height: 2.4rem;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+    z-index: 1001;
+  }
+  .lb-close:hover { background: rgba(220,20,60,0.7); }
+
+  .lb-nav {
+    position: fixed;
+    top: 50%; transform: translateY(-50%);
+    background: rgba(255,255,255,0.08);
+    border: none; color: #fff;
+    font-size: 2.4rem;
+    width: 3rem; height: 4.5rem;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+    z-index: 1001; line-height: 1;
+  }
+  .lb-nav:hover { background: rgba(220,20,60,0.6); }
+  .lb-prev { left: 0.6rem; }
+  .lb-next { right: 0.6rem; }
+
+  /* ── Responsive ── */
+  @media (max-width: 600px) {
+    .insta-grid { gap: 2px; }
+  }
+</style>
+
+<script>
+  // ── Filter ──
+  const filterBtns = document.querySelectorAll<HTMLButtonElement>('.filter-btn');
+  const cells = document.querySelectorAll<HTMLDivElement>('.insta-cell');
+
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const f = btn.dataset.filter!;
+      cells.forEach(cell => {
+        cell.classList.toggle('hidden', f !== 'all' && cell.dataset.type !== f);
+      });
+    });
+  });
+
+  // ── Lightbox ──
+  const lightbox  = document.getElementById('lightbox')!;
+  const lbImg     = document.getElementById('lbImg') as HTMLImageElement;
+  const lbLabel   = document.getElementById('lbLabel')!;
+  const lbCounter = document.getElementById('lbCounter')!;
+
+  function visibleCells(): HTMLDivElement[] {
+    return Array.from(cells).filter(c => !c.classList.contains('hidden'));
+  }
+
+  let currentIdx = 0;
+
+  function openLightbox(cell: HTMLDivElement) {
+    const vis = visibleCells();
+    currentIdx = vis.indexOf(cell);
+    renderItem(currentIdx, vis);
+    lightbox.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function renderItem(idx: number, vis?: HTMLDivElement[]) {
+    const list = vis ?? visibleCells();
+    if (!list.length) return;
+    currentIdx = (idx + list.length) % list.length;
+    const cell = list[currentIdx];
+    lbImg.src = cell.dataset.src!;
+    lbImg.alt = cell.dataset.alt ?? '';
+    lbLabel.textContent = cell.dataset.label ?? cell.dataset.alt ?? '';
+    lbCounter.textContent = `${currentIdx + 1} / ${list.length}`;
+  }
+
+  function closeLightbox() {
+    lightbox.classList.remove('open');
+    document.body.style.overflow = '';
+    lbImg.src = '';
+  }
+
+  cells.forEach(cell => cell.addEventListener('click', () => openLightbox(cell)));
+  document.getElementById('lbClose')!.addEventListener('click', closeLightbox);
+  lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
+  document.getElementById('lbPrev')!.addEventListener('click', e => { e.stopPropagation(); renderItem(currentIdx - 1); });
+  document.getElementById('lbNext')!.addEventListener('click', e => { e.stopPropagation(); renderItem(currentIdx + 1); });
+
+  document.addEventListener('keydown', e => {
+    if (!lightbox.classList.contains('open')) return;
+    if (e.key === 'Escape')       closeLightbox();
+    else if (e.key === 'ArrowLeft')  { e.preventDefault(); renderItem(currentIdx - 1); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); renderItem(currentIdx + 1); }
+  });
+</script>

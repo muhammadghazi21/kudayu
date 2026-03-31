@@ -1,0 +1,708 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+import { communityEvents, getEventBySlug } from '@/data/community';
+import type { GetStaticPaths } from 'astro';
+
+export const getStaticPaths: GetStaticPaths = () =>
+  communityEvents.map((e) => ({ params: { slug: e.slug } }));
+
+const { slug } = Astro.params;
+const event = getEventBySlug(slug as string);
+
+if (!event) return Astro.redirect('/community');
+
+const { details } = event;
+
+const statusLabel = {
+  upcoming: { text: 'Segera',      bg: 'rgba(52,152,219,0.15)',  color: '#3498db' },
+  ongoing:  { text: 'Berlangsung', bg: 'rgba(39,174,96,0.15)',   color: '#2ecc71' },
+  finished: { text: 'Selesai',     bg: 'rgba(149,165,166,0.15)', color: '#95a5a6' },
+};
+const modeLabel = {
+  offline: { icon: '📍', text: 'Offline' },
+  online:  { icon: '💻', text: 'Online'  },
+  hybrid:  { icon: '🌐', text: 'Hybrid'  },
+};
+const s = statusLabel[event.status];
+const m = modeLabel[event.mode];
+
+const schedColors = ['#C0121A', '#1E5B99', '#B86A0A', '#1E7A50'];
+
+// Group schedule items by `.day` so same-day rows render under one header
+type SchedGroup = { day?: string; items: NonNullable<typeof details.schedule> };
+const scheduleGroups: SchedGroup[] = [];
+if (details.schedule) {
+  for (const item of details.schedule) {
+    const last = scheduleGroups[scheduleGroups.length - 1];
+    if (!last || last.day !== item.day) scheduleGroups.push({ day: item.day, items: [item] });
+    else last.items.push(item);
+  }
+}
+---
+
+<Layout
+  title={event.title}
+  description={event.desc}
+>
+  <Header />
+
+  <main>
+    <!-- ── Hero ── -->
+    <div class="detail-hero">
+      <img src={event.image} alt={event.title} class="hero-img" />
+      <div class="hero-overlay"></div>
+      <div class="container hero-content">
+        <a href="/community" class="back-link">← Kembali ke Komunitas</a>
+        <div class="hero-badges">
+          <span class="cat-badge" style={`background:${event.categoryColor}33;color:${event.categoryColor};border:1px solid ${event.categoryColor}55`}>
+            {event.category}
+          </span>
+          <span class="mode-badge">{m.icon} {m.text}</span>
+          <span class="status-badge" style={`background:${s.bg};color:${s.color}`}>{s.text}</span>
+        </div>
+        <h1>{event.title}</h1>
+        <div class="hero-meta">
+          <span>🗓️ {event.date}</span>
+          <span>📍 {event.location}</span>
+          {event.prize && <span class="prize-pill">🏆 {event.prize}</span>}
+        </div>
+      </div>
+    </div>
+
+    <div class="container detail-layout">
+
+      <!-- ── Left / Main column ── -->
+      <div class="detail-main">
+
+        <!-- Description -->
+        <section class="detail-card">
+          <h2 class="card-heading">Tentang Event</h2>
+          <div class="long-desc">
+            {details.longDesc.split('\n\n').map((para) => (
+              <p>{para}</p>
+            ))}
+          </div>
+        </section>
+
+        <!-- Schedule / Rundown -->
+        {details.schedule && details.schedule.length > 0 && (
+          <section class="detail-card">
+            <h2 class="card-heading">🗓️ Susunan Acara</h2>
+            <div class="sched-table">
+              {scheduleGroups.map((group, gi) => (
+                <>
+                  {group.day && (
+                    <div class="sched-day-row" style={`--gi:${gi}`}>
+                      <span class="sched-day-label">{group.day}</span>
+                    </div>
+                  )}
+                  {group.items.map((item, i) => (
+                    <div class="sched-row" style={`--i:${gi * 20 + i};--c:${schedColors[(gi * 20 + i) % schedColors.length]}`}>
+                      <div class="sched-time-col">
+                        <span class="sched-time">{item.time}</span>
+                      </div>
+                      <div class="sched-col-divider"></div>
+                      <div class="sched-content">
+                        <p class="sched-activity">{item.activity}</p>
+                        {item.location && (
+                          <span class="sched-loc">📍 {item.location}</span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </>
+              ))}
+            </div>
+          </section>
+        )}
+
+        <!-- Requirements -->
+        {details.requirements && details.requirements.length > 0 && (
+          <section class="detail-card">
+            <h2 class="card-heading">📋 Syarat & Ketentuan</h2>
+            <ul class="req-list">
+              {details.requirements.map((req) => (
+                <li>
+                  <span class="req-bullet"></span>
+                  <span>{req}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        <!-- Prizes -->
+        {details.prizes && details.prizes.length > 0 && (
+          <section class="detail-card">
+            <h2 class="card-heading">🏆 Hadiah</h2>
+            <div class="prizes-grid">
+              {details.prizes.map((p, i) => (
+                <div class="prize-item" style={`--accent:${event.categoryColor}`}>
+                  <span class="prize-rank">{p.rank}</span>
+                  <span class="prize-reward">{p.reward}</span>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        <!-- FAQ -->
+        {details.faq && details.faq.length > 0 && (
+          <section class="detail-card">
+            <h2 class="card-heading">❓ FAQ</h2>
+            <div class="faq-list">
+              {details.faq.map((item) => (
+                <details class="faq-item">
+                  <summary class="faq-q">{item.q}</summary>
+                  <p class="faq-a">{item.a}</p>
+                </details>
+              ))}
+            </div>
+          </section>
+        )}
+
+      </div>
+
+      <!-- ── Right / Sidebar ── -->
+      <aside class="detail-sidebar">
+
+        <!-- Registration CTA -->
+        <div class="sidebar-card cta-card" style={`--accent:${event.categoryColor}`}>
+          <div class="cta-card-accent" style={`background:${event.categoryColor}`}></div>
+          <h3>Ikut Berpartisipasi</h3>
+          {details.regOpen && (
+            <div class="reg-dates">
+              <div class="reg-date-row">
+                <span class="reg-label">Pendaftaran dibuka</span>
+                <span class="reg-value">{details.regOpen}</span>
+              </div>
+              {details.regClose && (
+                <div class="reg-date-row">
+                  <span class="reg-label">Deadline daftar</span>
+                  <span class="reg-value">{details.regClose}</span>
+                </div>
+              )}
+            </div>
+          )}
+          {!details.regOpen && (
+            <p class="no-reg-text">
+              {event.status === 'finished'
+                ? 'Pendaftaran telah ditutup. Event ini sudah selesai.'
+                : 'Info pendaftaran akan segera diumumkan.'}
+            </p>
+          )}
+          {details.regLink && event.status !== 'finished' && (
+            <a
+              href={details.regLink}
+              class="btn btn-primary reg-btn"
+              target="_blank"
+              rel="noopener"
+              style={`background:${event.categoryColor};border-color:${event.categoryColor}`}
+            >
+              Daftar Sekarang →
+            </a>
+          )}
+          {event.status === 'finished' && (
+            <span class="finished-label">Event telah selesai</span>
+          )}
+        </div>
+
+        <!-- Event Info -->
+        <div class="sidebar-card info-card">
+          <h3>Info Event</h3>
+          <div class="info-rows">
+            <div class="info-row">
+              <span class="info-icon">📅</span>
+              <div>
+                <span class="info-label">Tanggal</span>
+                <span class="info-value">{event.date}</span>
+              </div>
+            </div>
+            <div class="info-row">
+              <span class="info-icon">📍</span>
+              <div>
+                <span class="info-label">Lokasi</span>
+                <span class="info-value">{event.location}</span>
+              </div>
+            </div>
+            <div class="info-row">
+              <span class="info-icon">{m.icon}</span>
+              <div>
+                <span class="info-label">Format</span>
+                <span class="info-value">{m.text}</span>
+              </div>
+            </div>
+            {event.prize && (
+              <div class="info-row">
+                <span class="info-icon">🏆</span>
+                <div>
+                  <span class="info-label">Total Hadiah</span>
+                  <span class="info-value prize-value">{event.prize}</span>
+                </div>
+              </div>
+            )}
+            {details.organizer && (
+              <div class="info-row">
+                <span class="info-icon">🏢</span>
+                <div>
+                  <span class="info-label">Penyelenggara</span>
+                  <span class="info-value">{details.organizer}</span>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <!-- Contact -->
+        {details.contact && details.contact.length > 0 && (
+          <div class="sidebar-card info-card">
+            <h3>Hubungi Panitia</h3>
+            <div class="contact-list">
+              {details.contact.map((c) => (
+                <div class="contact-row">
+                  <span class="contact-platform">{c.platform}</span>
+                  <span class="contact-value">{c.value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <!-- Other Events -->
+        <div class="sidebar-card info-card">
+          <h3>Event Lainnya</h3>
+          <div class="other-events">
+            {communityEvents
+              .filter((e) => e.slug !== event.slug)
+              .slice(0, 4)
+              .map((e) => (
+                <a href={`/community/${e.slug}`} class="other-event-item">
+                  <img src={e.image} alt={e.title} />
+                  <div>
+                    <span class="other-event-cat" style={`color:${e.categoryColor}`}>{e.category}</span>
+                    <span class="other-event-title">{e.title}</span>
+                  </div>
+                </a>
+              ))}
+          </div>
+        </div>
+
+      </aside>
+    </div>
+  </main>
+
+  <Footer />
+</Layout>
+
+<style>
+  /* ── Hero ── */
+  .detail-hero {
+    position: relative;
+    height: 420px;
+    overflow: hidden;
+    display: flex;
+    align-items: flex-end;
+  }
+  .hero-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 30%;
+  }
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top,
+      rgba(10, 4, 8, 0.95) 0%,
+      rgba(20, 6, 12, 0.65) 55%,
+      rgba(20, 6, 12, 0.20) 100%
+    );
+  }
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    padding-bottom: var(--spacing-xl);
+    padding-top: var(--spacing-xl);
+  }
+  .back-link {
+    display: inline-block;
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 0.9rem;
+    transition: color var(--transition-fast);
+  }
+  .back-link:hover { color: #fff; }
+
+  .hero-badges {
+    display: flex;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.75rem;
+  }
+  .cat-badge, .mode-badge, .status-badge {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.25rem 0.65rem;
+    border-radius: 20px;
+    letter-spacing: 0.03em;
+  }
+  .mode-badge {
+    background: rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.85);
+  }
+
+  .hero-content h1 {
+    font-size: clamp(1.7rem, 4vw, 2.8rem);
+    color: #fff;
+    line-height: 1.2;
+    margin-bottom: 0.75rem;
+    text-shadow: 0 2px 16px rgba(0,0,0,0.4);
+  }
+  .hero-meta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: 0.88rem;
+    color: rgba(255,255,255,0.7);
+  }
+  .prize-pill {
+    font-weight: 700;
+    color: #FFD700;
+  }
+
+  /* ── Layout ── */
+  .detail-layout {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: var(--spacing-xl);
+    align-items: start;
+    padding-top: var(--spacing-xl);
+    padding-bottom: var(--spacing-2xl);
+  }
+
+  /* ── Cards ── */
+  .detail-card, .sidebar-card {
+    background: var(--bg-card);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-md);
+  }
+  .card-heading {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-md);
+    padding-bottom: 0.6rem;
+    border-bottom: 1.5px solid var(--border);
+  }
+  .sidebar-card h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-sm);
+    padding-bottom: 0.5rem;
+    border-bottom: 1.5px solid var(--border);
+  }
+
+  /* ── Long description ── */
+  .long-desc p {
+    font-size: 0.97rem;
+    color: var(--text-secondary);
+    line-height: 1.75;
+    margin-bottom: 0.9rem;
+  }
+  .long-desc p:last-child { margin-bottom: 0; }
+
+  /* ── Schedule (CNN-style grouped table) ── */
+  @keyframes fadeRow {
+    from { opacity: 0; transform: translateY(5px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .sched-table {
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  /* Day header row */
+  .sched-day-row {
+    display: flex;
+    align-items: center;
+    background: var(--primary);
+    padding: 0.5rem 1.1rem;
+    opacity: 0;
+    animation: fadeRow 0.3s ease forwards;
+    animation-delay: calc(var(--gi, 0) * 0.08s);
+  }
+  .sched-day-label {
+    font-size: 0.82rem;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+  }
+
+  /* Content row */
+  .sched-row {
+    display: grid;
+    grid-template-columns: 130px 3px 1fr;
+    align-items: stretch;
+    min-height: 68px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-card);
+    transition: background 0.14s;
+    opacity: 0;
+    animation: fadeRow 0.35s ease forwards;
+    animation-delay: calc(var(--i, 0) * 0.045s);
+  }
+  .sched-row:last-child  { border-bottom: none; }
+  .sched-row:hover       { background: var(--bg-silver); }
+
+  /* Time column */
+  .sched-time-col {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.9rem 0.75rem;
+  }
+  .sched-time {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+
+  /* Divider */
+  .sched-col-divider {
+    width: 3px;
+    background: rgba(192, 18, 26, 0.35);
+    align-self: stretch;
+  }
+
+  /* Content column */
+  .sched-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.25rem;
+    padding: 0.9rem 1.2rem;
+  }
+  .sched-activity {
+    font-size: 0.97rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.45;
+    margin: 0;
+  }
+  .sched-loc {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+
+  /* ── Requirements ── */
+  .req-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+  .req-list li {
+    display: flex;
+    gap: 0.7rem;
+    align-items: flex-start;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+  .req-bullet {
+    flex-shrink: 0;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--primary);
+    margin-top: 0.45em;
+  }
+
+  /* ── Prizes ── */
+  .prizes-grid { display: flex; flex-direction: column; gap: 0.5rem; }
+  .prize-item {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    padding: 0.65rem 0.75rem;
+    border-radius: 10px;
+    background: var(--bg-silver);
+    border-left: 3px solid var(--accent);
+  }
+  .prize-rank {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    min-width: 140px;
+    flex-shrink: 0;
+  }
+  .prize-reward {
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+  }
+
+  /* ── FAQ ── */
+  .faq-list { display: flex; flex-direction: column; gap: 0.5rem; }
+  .faq-item {
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: border-color var(--transition-fast);
+  }
+  .faq-item[open] { border-color: rgba(220,20,60,0.25); }
+  .faq-q {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    padding: 0.8rem 1rem;
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .faq-q::after {
+    content: '＋';
+    font-size: 1rem;
+    color: var(--primary);
+    flex-shrink: 0;
+    transition: transform var(--transition-fast);
+  }
+  .faq-item[open] .faq-q::after { transform: rotate(45deg); }
+  .faq-a {
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    line-height: 1.65;
+    padding: 0 1rem 0.85rem;
+    margin: 0;
+  }
+
+  /* ── Sidebar CTA card ── */
+  .cta-card {
+    position: relative;
+    overflow: hidden;
+    padding-left: calc(var(--spacing-lg) + 4px);
+  }
+  .cta-card-accent {
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    width: 4px;
+  }
+  .cta-card h3 {
+    font-size: 1rem;
+    border-color: rgba(0,0,0,0.06);
+  }
+  .reg-dates { display: flex; flex-direction: column; gap: 0.45rem; margin-bottom: var(--spacing-sm); }
+  .reg-date-row { display: flex; flex-direction: column; gap: 0.1rem; }
+  .reg-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); }
+  .reg-value { font-size: 0.9rem; font-weight: 600; color: var(--text-primary); }
+  .no-reg-text { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin-bottom: var(--spacing-sm); }
+  .reg-btn {
+    display: block;
+    text-align: center;
+    border-radius: 50px !important;
+    font-size: 0.95rem;
+    padding: 0.7rem 1.5rem;
+    width: 100%;
+  }
+  .finished-label {
+    display: block;
+    text-align: center;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    padding: 0.5rem 0;
+  }
+
+  /* ── Info rows ── */
+  .info-rows { display: flex; flex-direction: column; gap: 0.7rem; }
+  .info-row {
+    display: flex;
+    gap: 0.7rem;
+    align-items: flex-start;
+    font-size: 0.85rem;
+  }
+  .info-icon { font-size: 1rem; flex-shrink: 0; margin-top: 0.05rem; }
+  .info-row > div { display: flex; flex-direction: column; gap: 0.05rem; }
+  .info-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); }
+  .info-value { color: var(--text-secondary); line-height: 1.4; }
+  .prize-value { color: var(--accent-orange); font-weight: 700; }
+
+  /* ── Contact ── */
+  .contact-list { display: flex; flex-direction: column; gap: 0.5rem; }
+  .contact-row { display: flex; gap: 0.6rem; align-items: center; font-size: 0.85rem; }
+  .contact-platform {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.15rem 0.5rem;
+    border-radius: 6px;
+    background: var(--bg-silver);
+    color: var(--text-muted);
+    min-width: 68px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .contact-value { color: var(--text-secondary); }
+
+  /* ── Other events ── */
+  .other-events { display: flex; flex-direction: column; gap: 0.6rem; }
+  .other-event-item {
+    display: flex;
+    gap: 0.65rem;
+    align-items: center;
+    text-decoration: none;
+    border-radius: 8px;
+    padding: 0.35rem 0.4rem;
+    transition: background var(--transition-fast);
+  }
+  .other-event-item:hover { background: var(--bg-silver); }
+  .other-event-item img {
+    width: 48px; height: 48px;
+    object-fit: cover;
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+  .other-event-item > div { display: flex; flex-direction: column; gap: 0.1rem; }
+  .other-event-cat { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
+  .other-event-title { font-size: 0.82rem; color: var(--text-primary); font-weight: 600; line-height: 1.3; }
+
+  /* ── Responsive ── */
+  @media (max-width: 1024px) {
+    .detail-layout {
+      grid-template-columns: 1fr 280px;
+      gap: var(--spacing-md);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .detail-hero { height: 360px; }
+    .detail-layout {
+      grid-template-columns: 1fr;
+    }
+    .detail-sidebar { order: -1; }
+    .sched-row { grid-template-columns: 110px 3px 1fr; min-height: 58px; }
+    .sched-time { font-size: 0.95rem; }
+    .sched-activity { font-size: 0.9rem; }
+    .prize-rank { min-width: 100px; }
+  }
+
+  @media (max-width: 480px) {
+    .detail-hero { height: 300px; }
+    .hero-content h1 { font-size: 1.5rem; }
+    .hero-meta { flex-direction: column; gap: 0.3rem; }
+    .sched-row { grid-template-columns: 95px 3px 1fr; min-height: 52px; }
+    .sched-time { font-size: 0.85rem; }
+    .sched-time-col { padding: 0.7rem 0.5rem; }
+    .sched-content { padding: 0.7rem 0.85rem; }
+  }
+</style>

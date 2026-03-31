@@ -1,0 +1,1858 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+import Hero from '@/components/Hero.astro';
+import HorseCard from '@/components/HorseCard.astro';
+import VideoEmbed from '@/components/VideoEmbed.astro';
+import { getFeaturedHorses, getTopWinners } from '@/data/horses';
+import { getUpcomingRaces, getFinishedRaces } from '@/data/races';
+import { getFeaturedNews } from '@/data/news';
+import { getHomePreviews } from '@/data/community';
+
+const featuredHorses = getFeaturedHorses();
+const topWinners = getTopWinners(3);
+const upcomingRaces = getUpcomingRaces().slice(0, 2);
+const finishedRaces = getFinishedRaces().slice(0, 2);
+const homeRaces = [...upcomingRaces, ...finishedRaces];
+const latestNews = getFeaturedNews().slice(0, 3);
+
+const communityEvents = getHomePreviews();
+
+// Quick stats for the strip below hero
+const totalHorses   = (await import('@/data/horses')).horses.length;
+const totalRaces    = (await import('@/data/races')).races.length;
+const totalEvents   = (await import('@/data/community')).communityEvents.length;
+---
+
+<Layout 
+  title="Beranda" 
+  description="Kudayu - Platform informasi pacuan kuda terlengkap di Indonesia. Profil kuda, jadwal race, berita terkini, dan galeri."
+>
+  <Header />
+  
+  <main>
+    <!-- Hero Section -->
+    <Hero
+      title="Selamat Datang di Dunia Pacuan Kuda"
+      subtitle="Temukan profil kuda favorit, ikuti jadwal race terbaru, dan nikmati galeri foto & video spektakuler dari arena pacuan"
+      image="https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?w=1920&auto=format&fit=crop"
+      ctaText="Lihat Jadwal Race →"
+      ctaLink="/races"
+    />
+
+    <!-- Quick Stats Strip -->
+    <div class="stats-strip">
+      <div class="container stats-strip-inner">
+        <div class="stats-strip-item">
+          <span class="stats-num">{totalHorses}</span>
+          <span class="stats-label">🐎 Kuda Terdaftar</span>
+        </div>
+        <div class="stats-strip-divider"></div>
+        <div class="stats-strip-item">
+          <span class="stats-num">{totalRaces}</span>
+          <span class="stats-label">🏁 Race Tercatat</span>
+        </div>
+        <div class="stats-strip-divider"></div>
+        <div class="stats-strip-item">
+          <span class="stats-num">{totalEvents}</span>
+          <span class="stats-label">✨ Event Komunitas</span>
+        </div>
+        <div class="stats-strip-divider"></div>
+        <div class="stats-strip-item">
+          <span class="stats-num">12</span>
+          <span class="stats-label">🌏 Provinsi</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- About Kudayu Strip -->
+    <section class="about-strip">
+      <div class="container about-strip-inner">
+        <div class="about-strip-text">
+          <h2 class="about-strip-heading">Apa itu <span class="about-accent">Kudayu</span>?</h2>
+          <p class="about-strip-desc"
+            >Platform informasi pacuan kuda Indonesia — dari profil kuda unggulan &amp; jadwal race nasional hingga event komunitas penggemar Uma Musume. Satu tempat untuk semua yang kamu butuhkan tentang dunia pacuan kuda.</p
+          >
+          <div class="about-strip-links">
+            <a href="/horses" class="about-link">Profil Kuda</a>
+            <a href="/races" class="about-link">Jadwal Race</a>
+            <a href="/community" class="about-link">Komunitas</a>
+            <a href="/gallery" class="about-link">Galeri</a>
+          </div>
+        </div>
+        <div class="about-strip-visual">
+          <img src="/kuda-asli-2.jpg" alt="Kuda pacu Indonesia" class="about-strip-img" loading="lazy" />
+          <div class="about-strip-badge">
+            <span>🏆</span>
+            <span>Indonesia's #1<br/>Platform Pacuan&nbsp;Kuda</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured Horses Section - Visual Showcase -->
+    <section class="section featured-showcase">
+      <div class="container">
+        <h2 class="section-title">🏆 Kuda-Kuda Unggulan</h2>
+        <div class="showcase-grid">
+          {featuredHorses.map((horse, index) => (
+            <a href={`/horses/${horse.slug}`} class="showcase-item" data-index={index}>
+              <div class="showcase-image">
+                <img src={horse.image} alt={horse.name} loading="lazy" />
+                <div class="showcase-overlay"></div>
+              </div>
+              <div class="showcase-content">
+                <div class="showcase-badge">⭐ Featured</div>
+                <h3 class="showcase-title">{horse.name}</h3>
+                <p class="showcase-breed">{horse.breed}</p>
+                <div class="showcase-stats">
+                  <span>🏆 {horse.wins} Wins</span>
+                  <span>⚡ Speed {horse.stats.speed}</span>
+                </div>
+              </div>
+            </a>
+          ))}
+        </div>
+        <div class="text-center mt-3">
+          <a href="/horses" class="btn btn-primary btn-large">Jelajahi Semua Kuda →</a>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Races Section -->
+    <section class="section races-banner">
+      <div class="container">
+        <h2 class="section-title">🏁 Pacuan Kuda</h2>
+        <div class="races-list">
+          {homeRaces.map((race, index) => (
+            <article
+              class={`race-card ${race.status === 'finished' ? 'race-card--finished' : 'race-card--upcoming'}`}
+              style={`background-image: url(/stadion-${(index % 3) + 1}.png)`}
+            >
+              <div class="race-card-overlay"></div>
+              <div class="race-card-top">
+                <span class={`race-status-badge ${race.status === 'finished' ? 'badge--finished' : 'badge--upcoming'}`}>
+                  {race.status === 'finished' ? '✓ SELESAI' : '📅 MENDATANG'}
+                </span>
+                <span class="race-grade-pill">{race.grade}</span>
+              </div>
+              <div class="race-card-body">
+                <div class="race-card-left">
+                  <h3 class="race-card-title">{race.name}</h3>
+                  <div class="race-card-meta">
+                    <span>📍 {race.location.split(',')[0]}</span>
+                    <span>📏 {race.distance}</span>
+                    <span>📅 {new Date(race.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                  </div>
+                  <a href={`/races#${race.id}`} class="race-card-cta">
+                    {race.status === 'finished' ? 'Lihat Hasil' : 'Detail Race'} <span>→</span>
+                  </a>
+                </div>
+                <div class="race-card-right">
+                  <div class="race-prize-block">
+                    <span class="prize-label">Total Hadiah</span>
+                    <span class="prize-amount">{race.prize}</span>
+                  </div>
+                  {race.winner && (
+                    <div class="race-winner-block">
+                      <span class="winner-crown">🏆</span>
+                      <div class="winner-info">
+                        <span class="winner-label">Pemenang</span>
+                        <span class="winner-name">{race.winner}</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+        <div class="races-footer">
+          <a href="/races" class="btn btn-secondary">Lihat Semua Race →</a>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Featured Video Section -->
+    <section class="section video-highlight-section">
+      <div class="container">
+        <h2 class="section-title">🎥 Video Highlight</h2>
+        <div class="video-feature-wrap">
+          <div class="video-embed-col">
+            <div class="video-lazy-wrap">
+              <iframe
+                class="video-lazy-iframe"
+                data-src="https://www.youtube.com/embed/hBviFDKPaow?autoplay=1&mute=1&rel=0&modestbranding=1&loop=1&playlist=hBviFDKPaow"
+                title="Indonesia's Horse Racing – Piala Raja Hamengku Buwono X 2025"
+                allow="autoplay; encrypted-media; picture-in-picture"
+                allowfullscreen
+                frameborder="0"
+              ></iframe>
+            </div>
+          </div>
+          <div class="video-info-col">
+            <div class="video-info-inner">
+              <div class="video-info-tags">
+                <span class="video-tag tag-live">🗳 Live Event</span>
+                <span class="video-tag tag-g1">G1 Race</span>
+                <span class="video-tag tag-official">Official</span>
+              </div>
+              <h3 class="video-info-title">Indonesia's Horse Racing: Piala Raja Hamengku Buwono X 2025</h3>
+              <p class="video-info-desc">Saksikan momen spektakuler penutup musim pacuan 2025 — 120 kuda dari 10 provinsi bersaing di Lapangan Sultan Agung, Yogyakarta. Triple's dari Jawa Tengah tampil perkasa merebut trofi kehormatan langsung dari Sultan Hamengkubuwono X.</p>
+              <div class="video-info-meta">
+                <div class="video-meta-item">
+                  <span class="video-meta-icon">📅</span>
+                  <span>9 November 2025</span>
+                </div>
+                <div class="video-meta-item">
+                  <span class="video-meta-icon">📍</span>
+                  <span>Lap. Sultan Agung, Yogyakarta</span>
+                </div>
+                <div class="video-meta-item">
+                  <span class="video-meta-icon">🐎</span>
+                  <span>120 kuda · 10 provinsi</span>
+                </div>
+                <div class="video-meta-item">
+                  <span class="video-meta-icon">💰</span>
+                  <span class="video-meta-prize">Rp 1.000.000.000</span>
+                </div>
+              </div>
+              <a href="https://www.youtube.com/@SargaCo" target="_blank" rel="noopener" class="video-info-cta">
+                Tonton di YouTube <span>↗</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Community Events Section -->
+    <section class="section community-events-section">
+      <div class="container">
+        <h2 class="section-title">✨ Event Komunitas</h2>
+        <p class="section-subtitle">Event seru bagi para penggemar umamusume, cosplayer, dan wibu di Indonesia</p>
+        <div class="community-events-grid">
+          {communityEvents.map((ev) => (
+            <a href={`/community/${ev.slug}`} class="community-card-link">
+            <article class="community-card">
+              <img src={ev.image} alt={ev.title} class="community-card-img" loading="lazy" />
+              <div class="community-card-overlay">
+                <span class={`community-tag ${ev.tagClass}`}>{ev.tag}</span>
+                <h3 class="community-card-title">{ev.title}</h3>
+                <p class="community-card-desc">{ev.desc}</p>
+                <div class="community-card-meta">
+                  <span>📅 {ev.date}</span>
+                  <span>📍 {ev.location}</span>
+                </div>
+              </div>
+            </article>
+            </a>
+          ))}
+        </div>
+        <div class="section-footer">
+          <a href="/community" class="btn btn-primary">Lihat Semua Event Komunitas →</a>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Latest News Section - Timeline Style -->
+    <section class="section news-timeline">
+      <div class="container">
+        <h2 class="section-title">📰 Berita Terkini</h2>
+        <div class="timeline-list">
+          {latestNews.map((article, index) => (
+            <article class="timeline-item" data-index={index}>
+              <div class="timeline-marker"></div>
+              <div class="timeline-content">
+                <div class="timeline-image">
+                  <img src={article.image} alt={article.title} loading="lazy" />
+                </div>
+                <div class="timeline-text">
+                  <span class="timeline-category">{article.category}</span>
+                  <h3 class="timeline-title">{article.title}</h3>
+                  <p class="timeline-excerpt">{article.excerpt}</p>
+                  <div class="timeline-meta">
+                    <span class="meta-item">
+                      <span class="meta-icon">✍️</span>
+                      {article.author}
+                    </span>
+                    <span class="meta-item">
+                      <span class="meta-icon">📅</span>
+                      {(new Date(article.date).toLocaleDateString('id-ID', { month: 'short', day: 'numeric' }))}
+                    </span>
+                  </div>
+                  <a href={`/news/${article.slug}`} class="timeline-link">
+                    Baca Selengkapnya →
+                  </a>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+        <div class="text-center mt-3">
+          <a href="/news" class="btn btn-secondary btn-large">Lihat Semua Berita →</a>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Stats Section - Podium/Leaderboard -->
+    <section class="section leaderboard-section">
+      <div class="container">
+        <h2 class="section-title">🏅 Top Winners Leaderboard</h2>
+        <div class="podium">
+          {topWinners.map((horse, index) => (
+            <a href={`/horses/${horse.slug}`} class="podium-item" data-rank={index + 1}>
+              <div class="podium-rank">
+                <span class="rank-number">#{index + 1}</span>
+                {index === 0 && <span class="crown">👑</span>}
+              </div>
+              <div class="podium-image">
+                <img src={horse.image} alt={horse.name} loading="lazy" />
+                <div class="podium-glow"></div>
+              </div>
+              <div class="podium-info">
+                <h3 class="podium-name">{horse.name}</h3>
+                <div class="podium-stats">
+                  <span class="stat-wins">🏆 {horse.wins}</span>
+                  <span class="stat-speed">⚡ {horse.stats.speed}</span>
+                </div>
+              </div>
+            </a>
+          ))}
+        </div>
+        <div class="section-footer">
+          <a href="/horses" class="btn btn-secondary">Lihat Semua Kuda →</a>
+        </div>
+      </div>
+    </section>
+  </main>
+  
+  <Footer />
+</Layout>
+
+<script>
+  // Lazy-autoplay the video highlight when scrolled into view
+  document.addEventListener('DOMContentLoaded', () => {
+    const lazyIframe = document.querySelector('.video-lazy-iframe') as HTMLIFrameElement | null;
+    if (!lazyIframe) return;
+    let loaded = false;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !loaded) {
+            loaded = true;
+            const src = lazyIframe.getAttribute('data-src');
+            if (src) lazyIframe.setAttribute('src', src);
+            observer.disconnect();
+          }
+        });
+      },
+      { threshold: 0.3 }
+    );
+    observer.observe(lazyIframe);
+  });
+</script>
+
+<style>
+  /* ── Stats Strip ── */
+  .stats-strip {
+    background: var(--primary);
+    padding: 0.85rem 0;
+  }
+  .stats-strip-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    flex-wrap: wrap;
+  }
+  .stats-strip-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.4rem 2.5rem;
+  }
+  .stats-num {
+    font-size: 1.65rem;
+    font-weight: 900;
+    color: #fff;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+  .stats-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.75);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-top: 0.1rem;
+    white-space: nowrap;
+  }
+  .stats-strip-divider {
+    width: 1px;
+    height: 40px;
+    background: rgba(255,255,255,0.25);
+    flex-shrink: 0;
+  }
+
+  /* ── About Strip ── */
+  .about-strip {
+    background: var(--bg-card);
+    border-bottom: 1.5px solid var(--border);
+    padding: var(--spacing-xl) 0;
+  }
+  .about-strip-inner {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: var(--spacing-2xl);
+    align-items: center;
+  }
+  .about-strip-heading {
+    font-size: 1.65rem;
+    font-weight: 900;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-sm);
+    line-height: 1.2;
+  }
+  .about-accent {
+    color: var(--primary);
+  }
+  .about-strip-desc {
+    font-size: 0.97rem;
+    color: var(--text-secondary);
+    line-height: 1.75;
+    max-width: 520px;
+    margin-bottom: var(--spacing-md);
+  }
+  .about-strip-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .about-link {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--primary);
+    border: 1.5px solid rgba(192,18,26,0.3);
+    border-radius: 20px;
+    padding: 0.35rem 1rem;
+    text-decoration: none;
+    transition: all 0.18s ease;
+  }
+  .about-link:hover {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+  }
+  .about-strip-visual {
+    position: relative;
+  }
+  .about-strip-img {
+    width: 100%;
+    height: 240px;
+    object-fit: cover;
+    border-radius: 16px;
+    display: block;
+  }
+  .about-strip-badge {
+    position: absolute;
+    bottom: -14px;
+    left: 20px;
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    background: var(--primary);
+    color: #fff;
+    border-radius: 12px;
+    padding: 0.55rem 1rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    line-height: 1.35;
+    box-shadow: 0 4px 16px rgba(192,18,26,0.35);
+  }
+  .about-strip-badge span:first-child { font-size: 1.3rem; }
+
+  /* ── Section footer (shared CTA row) ── */
+  .section-footer {
+    text-align: center;
+    margin-top: var(--spacing-xl);
+  }
+
+  /* Container Variants */
+  .container-fluid {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-md);
+  }
+
+  /* Featured Showcase - Visual Grid */
+  .featured-showcase {
+    background: linear-gradient(180deg, var(--bg-gradient-blue), var(--bg-white));
+    padding: var(--spacing-2xl) 0;
+  }
+
+  .showcase-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
+  }
+
+  .showcase-item {
+    position: relative;
+    border-radius: 24px;
+    overflow: hidden;
+    aspect-ratio: 5 / 7;
+    text-decoration: none;
+    transition: all 0.4s ease-out;
+    box-shadow: var(--shadow-lg);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    animation: cardIdle 3s ease-in-out infinite;
+  }
+
+  @keyframes cardIdle {
+    0%, 100% { 
+      box-shadow: var(--shadow-lg), 0 0 20px rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+    50% { 
+      box-shadow: var(--shadow-lg), 0 0 25px rgba(255, 255, 255, 0.3);
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+  }
+
+  @keyframes cardShake {
+    0%, 100% { transform: translateY(-20px) scale(1.12) rotate(0deg); }
+    25% { transform: translateY(-21px) scale(1.12) rotate(-1deg); }
+    75% { transform: translateY(-21px) scale(1.12) rotate(1deg); }
+  }
+
+  @keyframes cardGlow {
+    0%, 100% { 
+      box-shadow: var(--shadow-xl), 0 0 40px rgba(255, 255, 255, 0.7), 0 0 80px rgba(255, 255, 255, 0.5);
+    }
+    50% { 
+      box-shadow: var(--shadow-xl), 0 0 60px rgba(255, 255, 255, 0.9), 0 0 100px rgba(255, 255, 255, 0.7);
+    }
+  }
+
+  .showcase-grid:hover .showcase-item:not(:hover) {
+    filter: blur(3px) brightness(0.7);
+    transform: scale(0.95);
+    opacity: 0.6;
+  }
+
+  .showcase-item:hover {
+    animation: cardShake 0.3s ease-in-out 1 forwards, cardGlow 1.5s ease-in-out infinite;
+    border-color: rgba(255, 255, 255, 0.8);
+    z-index: 10;
+    transform: translateY(-20px) scale(1.12);
+  }
+
+  .showcase-image {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+
+  .showcase-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition-slow);
+  }
+
+  .showcase-item:hover .showcase-image img {
+    transform: scale(1.1);
+  }
+
+  .showcase-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.95) 0%,
+      rgba(0, 0, 0, 0.5) 50%,
+      rgba(0, 0, 0, 0.1) 100%
+    );
+    transition: background 0.45s ease;
+  }
+
+  .showcase-item:hover .showcase-overlay {
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.78) 0%,
+      rgba(0, 0, 0, 0.18) 40%,
+      rgba(0, 0, 0, 0.0) 100%
+    );
+  }
+
+  .showcase-overlay::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      120deg,
+      transparent 0%,
+      transparent 40%,
+      rgba(255, 255, 255, 0.4) 50%,
+      transparent 60%,
+      transparent 100%
+    );
+    transform: translateX(-100%);
+    transition: transform 0.6s ease-out;
+  }
+
+  .showcase-item:hover .showcase-overlay::before {
+    transform: translateX(100%);
+  }
+
+  .showcase-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: var(--spacing-lg);
+    z-index: 2;
+    color: var(--text-white);
+    transition: all var(--transition-medium);
+  }
+
+  .showcase-item:hover .showcase-content {
+    padding-bottom: var(--spacing-xl);
+  }
+
+  .showcase-content::before,
+  .showcase-content::after {
+    content: '✨';
+    position: absolute;
+    font-size: 1.5rem;
+    opacity: 0;
+    transition: all 0.4s ease-out;
+  }
+
+  .showcase-content::before {
+    top: -40px;
+    left: 20%;
+  }
+
+  .showcase-content::after {
+    top: -30px;
+    right: 20%;
+  }
+
+  .showcase-item:hover .showcase-content::before {
+    opacity: 1;
+    top: -60px;
+    animation: sparkle 1s ease-in-out infinite;
+  }
+
+  .showcase-item:hover .showcase-content::after {
+    opacity: 1;
+    top: -50px;
+    animation: sparkle 1s ease-in-out infinite 0.3s;
+  }
+
+  @keyframes sparkle {
+    0%, 100% { 
+      opacity: 0.6;
+      transform: scale(1) rotate(0deg);
+    }\n    50% { 
+      opacity: 1;
+      transform: scale(1.3) rotate(180deg);
+    }
+  }
+
+  .showcase-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    color: var(--text-primary);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-bottom: var(--spacing-xs);
+    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+    animation: badgePulse 2s ease-in-out infinite;
+  }
+
+  @keyframes badgePulse {
+    0%, 100% { 
+      box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+      transform: scale(1);
+    }
+    50% { 
+      box-shadow: 0 6px 20px rgba(255, 215, 0, 0.8);
+      transform: scale(1.05);
+    }
+  }
+
+  .showcase-item:hover .showcase-badge {
+    animation: badgePulse 0.3s ease-in-out infinite;
+  }
+
+  .showcase-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    margin-bottom: 0.25rem;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+    transition: all var(--transition-fast);
+  }
+
+  .showcase-item:hover .showcase-title {
+    transform: translateY(-3px);
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 255, 255, 0.9);
+  }
+
+  .showcase-breed {
+    color: var(--secondary-light);
+    font-size: 1rem;
+    margin-bottom: var(--spacing-sm);
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
+  }
+
+  .showcase-stats {
+    display: flex;
+    gap: var(--spacing-md);
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: all var(--transition-fast);
+  }
+
+  .showcase-stats span {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 0.4rem 0.8rem;
+    border-radius: 12px;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: all var(--transition-fast);
+  }
+
+  .showcase-item:hover .showcase-stats span {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.8);
+    transform: translateY(-2px);
+  }
+
+  /* Corner decorations for card effect */
+  .showcase-item::before,
+  .showcase-item::after {
+    content: '';
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    background-image: url('/double-star.svg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.7;
+    z-index: 3;
+    transition: all var(--transition-medium);
+  }
+
+  .showcase-item::before {
+    top: 12px;
+    left: 12px;
+  }
+
+  .showcase-item::after {
+    bottom: 12px;
+    right: 12px;
+    transform: rotate(180deg);
+  }
+
+  .showcase-item:hover::before,
+  .showcase-item:hover::after {
+    opacity: 1;
+    width: 80px;
+    height: 80px;
+    filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.9));
+  }
+
+  /* Races Banner - Horizontal Layout */
+  .races-banner {
+    background: var(--bg-white);
+    padding: var(--spacing-2xl) 0;
+  }
+
+  .races-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+  }
+
+  /* Race Card */
+  .race-card {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 340px;
+    box-shadow: var(--shadow-md);
+    transition: transform 0.35s ease, box-shadow 0.35s ease;
+  }
+
+  .race-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-xl);
+  }
+
+  .race-card-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top,
+      rgba(5, 5, 10, 0.97) 0%,
+      rgba(5, 5, 10, 0.75) 40%,
+      rgba(5, 5, 10, 0.25) 100%
+    );
+    transition: background 0.4s ease;
+    z-index: 1;
+  }
+
+  .race-card:hover .race-card-overlay {
+    background: linear-gradient(
+      to top,
+      rgba(5, 5, 10, 0.93) 0%,
+      rgba(5, 5, 10, 0.55) 45%,
+      rgba(5, 5, 10, 0.1) 100%
+    );
+  }
+
+  /* Finished card tint */
+  .race-card--finished .race-card-overlay {
+    background: linear-gradient(
+      to top,
+      rgba(5, 5, 10, 0.97) 0%,
+      rgba(5, 5, 10, 0.75) 40%,
+      rgba(30, 10, 10, 0.35) 100%
+    );
+  }
+
+  .race-card-top {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 1.25rem 1.25rem 0;
+  }
+
+  .race-status-badge {
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .badge--upcoming {
+    background: linear-gradient(135deg, var(--accent), var(--accent-orange));
+    color: #1a1a1a;
+    box-shadow: 0 2px 10px rgba(255, 215, 0, 0.4);
+  }
+
+  .badge--finished {
+    background: rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .race-grade-pill {
+    background: linear-gradient(135deg, var(--primary), #a00028);
+    color: #fff;
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    box-shadow: 0 2px 10px rgba(220, 20, 60, 0.4);
+  }
+
+  .race-card-body {
+    position: relative;
+    z-index: 2;
+    padding: 1rem 1.5rem 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr 220px;
+    gap: 1rem;
+    align-items: stretch;
+  }
+
+  .race-card-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    min-width: 0;
+    justify-content: flex-end;
+  }
+
+  .race-card-right {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    justify-content: flex-end;
+  }
+
+  .race-card-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #fff;
+    text-shadow: 1px 1px 6px rgba(0,0,0,0.8);
+    line-height: 1.3;
+    margin: 0;
+  }
+
+  .race-card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1rem;
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.75);
+    font-weight: 500;
+  }
+
+  /* Prize highlight */
+  .race-prize-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    background: linear-gradient(135deg, rgba(255,215,0,0.12), rgba(255,140,0,0.08));
+    border: 1px solid rgba(255, 215, 0, 0.35);
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    text-align: right;
+  }
+
+  .prize-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgba(255, 215, 0, 0.7);
+  }
+
+  .prize-amount {
+    font-size: 1.35rem;
+    font-weight: 900;
+    color: var(--accent);
+    text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+    letter-spacing: -0.01em;
+  }
+
+  /* Winner block */
+  .race-winner-block {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: linear-gradient(135deg, rgba(220,20,60,0.12), rgba(180,0,30,0.08));
+    border: 1px solid rgba(220,20,60,0.25);
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+  }
+
+  .winner-crown {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    filter: drop-shadow(0 0 8px rgba(255,215,0,0.6));
+  }
+
+  .winner-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.05rem;
+    min-width: 0;
+  }
+
+  .winner-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgba(255,255,255,0.5);
+  }
+
+  .winner-name {
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .race-card-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #fff;
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(8px);
+    padding: 0.55rem 1.1rem;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.2);
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-decoration: none;
+    transition: all 0.25s ease;
+    align-self: flex-start;
+  }
+
+  .race-card-cta:hover {
+    gap: 0.8rem;
+    background: rgba(255,255,255,0.2);
+    border-color: rgba(255,255,255,0.4);
+  }
+
+  .races-footer {
+    text-align: center;
+    margin-top: var(--spacing-xl);
+  }
+
+  /* News Timeline - List View */
+  .news-timeline {
+    background: linear-gradient(180deg, var(--bg-white), var(--bg-gradient-pink));
+    padding: var(--spacing-2xl) 0;
+  }
+
+  .timeline-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xl);
+    position: relative;
+    padding-left: 60px;
+  }
+
+  .timeline-list::before {
+    content: '';
+    position: absolute;
+    left: 20px;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, var(--primary), var(--accent), var(--secondary));
+    border-radius: 10px;
+  }
+
+  .timeline-item {
+    position: relative;
+    opacity: 0;
+    animation: fadeIn 0.6s ease-out forwards;
+  }
+
+  .timeline-item[data-index="0"] { animation-delay: 0.1s; }
+  .timeline-item[data-index="1"] { animation-delay: 0.2s; }
+  .timeline-item[data-index="2"] { animation-delay: 0.3s; }
+
+  .timeline-marker {
+    position: absolute;
+    left: -48px;
+    top: 24px;
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    border-radius: 50%;
+    border: 4px solid var(--bg-white);
+    box-shadow: 0 0 20px rgba(220, 20, 60, 0.5);
+    z-index: 2;
+  }
+
+  .timeline-content {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: var(--spacing-lg);
+    background: var(--bg-card);
+    border-radius: 20px;
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-medium);
+  }
+
+  .timeline-item:hover .timeline-content {
+    transform: translateX(8px);
+    box-shadow: var(--shadow-xl);
+  }
+
+  .timeline-image {
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .timeline-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    aspect-ratio: 1;
+    transition: transform var(--transition-slow);
+  }
+
+  .timeline-item:hover .timeline-image img {
+    transform: scale(1.1) rotate(2deg);
+  }
+
+  .timeline-text {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .timeline-category {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: var(--text-white);
+    padding: 0.375rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    width: fit-content;
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .timeline-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: var(--spacing-sm);
+    color: var(--text-primary);
+  }
+
+  .timeline-excerpt {
+    flex: 1;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .timeline-meta {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
+    font-size: 0.9rem;
+    color: var(--text-muted);
+  }
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+
+  .timeline-link {
+    color: var(--primary);
+    font-weight: 700;
+    text-decoration: none;
+    transition: all var(--transition-fast);
+  }
+
+  .timeline-link:hover {
+    color: var(--secondary);
+    transform: translateX(4px);
+  }
+
+  /* Leaderboard/Podium */
+  .leaderboard-section {
+    background: linear-gradient(135deg, var(--bg-gradient-blue), var(--bg-gradient-pink));
+    padding: var(--spacing-2xl) 0;
+  }
+
+  .podium {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-lg);
+    align-items: end;
+  }
+
+  .podium-item {
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: all var(--transition-medium);
+  }
+
+  .podium-item[data-rank="1"] {
+    order: 2;
+    transform: scale(1.1);
+  }
+
+  .podium-item[data-rank="2"] {
+    order: 1;
+  }
+
+  .podium-item[data-rank="3"] {
+    order: 3;
+  }
+
+  .podium-item:hover {
+    transform: scale(1.15) translateY(-10px);
+  }
+
+  .podium-item[data-rank="1"]:hover {
+    transform: scale(1.2) translateY(-10px);
+  }
+
+  .podium-rank {
+    position: relative;
+    margin-bottom: var(--spacing-md);
+  }
+
+  .rank-number {
+    display: inline-block;
+    width: 60px;
+    height: 60px;
+    line-height: 60px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: var(--text-white);
+    border-radius: 50%;
+    font-size: 1.5rem;
+    font-weight: 800;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .podium-item[data-rank="1"] .rank-number {
+    width: 80px;
+    height: 80px;
+    line-height: 80px;
+    font-size: 2rem;
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    box-shadow: 0 8px 30px rgba(255, 215, 0, 0.6);
+  }
+
+  .crown {
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 3rem;
+    animation: float 2s ease-in-out infinite;
+  }
+
+  .podium-image {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-bottom: var(--spacing-md);
+    border: 4px solid var(--bg-white);
+    box-shadow: var(--shadow-xl);
+  }
+
+  .podium-item[data-rank="1"] .podium-image {
+    width: 240px;
+    height: 240px;
+    border-width: 6px;
+    border-color: #FFD700;
+  }
+
+  .podium-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition-slow);
+  }
+
+  .podium-item:hover .podium-image img {
+    transform: scale(1.1);
+  }
+
+  .podium-glow {
+    position: absolute;
+    inset: -20px;
+    background: radial-gradient(circle, rgba(220, 20, 60, 0.4), transparent);
+    opacity: 0;
+    transition: opacity var(--transition-medium);
+  }
+
+  .podium-item:hover .podium-glow {
+    opacity: 1;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  .podium-name {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: var(--spacing-sm);
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .podium-item[data-rank="1"] .podium-name {
+    font-size: 1.75rem;
+  }
+
+  .podium-stats {
+    display: flex;
+    gap: var(--spacing-md);
+    justify-content: center;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .btn-large {
+    padding: 1rem 2.5rem;
+    font-size: 1.1rem;
+  }
+
+  /* Video Highlight Section */
+  .video-highlight-section {
+    background: linear-gradient(180deg, var(--bg-dark, #0f0f14) 0%, #1a0a0f 100%);
+    padding: var(--spacing-2xl) 0;
+  }
+
+  .video-highlight-section .section-title {
+    color: #fff;
+  }
+
+  .video-feature-wrap {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: var(--spacing-xl);
+    align-items: stretch;
+  }
+
+  .video-embed-col {
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .video-lazy-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16/9;
+    background: #000;
+  }
+
+  .video-lazy-iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  .video-info-col {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .video-info-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 1.75rem;
+    height: 100%;
+  }
+
+  .video-info-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .video-tag {
+    padding: 0.3rem 0.85rem;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .tag-live {
+    background: rgba(220,20,60,0.2);
+    color: #ff6b8a;
+    border: 1px solid rgba(220,20,60,0.3);
+  }
+
+  .tag-g1 {
+    background: rgba(255,215,0,0.15);
+    color: var(--accent);
+    border: 1px solid rgba(255,215,0,0.25);
+  }
+
+  .tag-official {
+    background: rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.6);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .video-info-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.35;
+    margin: 0;
+  }
+
+  .video-info-desc {
+    font-size: 0.88rem;
+    color: rgba(255,255,255,0.65);
+    line-height: 1.75;
+    margin: 0;
+  }
+
+  .video-info-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem 0.5rem;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    padding-top: 1rem;
+    margin-top: auto;
+  }
+
+  .video-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.82rem;
+    color: rgba(255,255,255,0.55);
+    font-weight: 500;
+  }
+
+  .video-meta-icon {
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+
+  .video-meta-prize {
+    color: var(--accent);
+    font-weight: 800;
+  }
+
+  .video-info-cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    color: #fff;
+    background: linear-gradient(135deg, var(--primary), #a00028);
+    padding: 0.75rem 1.25rem;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    box-shadow: 0 4px 16px rgba(220,20,60,0.35);
+    width: 100%;
+  }
+
+  .video-info-cta:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+  }
+
+  @media (max-width: 900px) {
+    .video-feature-wrap {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Community Events Section */
+  .community-events-section {
+    background: linear-gradient(180deg, var(--bg-gradient-pink), var(--bg-white));
+    padding: var(--spacing-2xl) 0;
+  }
+
+  .section-subtitle {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 1rem;
+    margin-top: -1rem;
+    margin-bottom: var(--spacing-xl);
+  }
+
+  .community-events-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-lg);
+  }
+
+  .community-card-link {
+    display: contents;
+    text-decoration: none;
+  }
+
+  .community-card {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    aspect-ratio: 6 / 19;
+    box-shadow: var(--shadow-md);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .community-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-xl);
+  }
+
+  .community-card-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+
+  .community-card:hover .community-card-img {
+    transform: scale(1.06);
+  }
+
+  .community-card-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top,
+      rgba(5, 5, 15, 0.97) 0%,
+      rgba(5, 5, 15, 0.65) 45%,
+      rgba(5, 5, 15, 0.1) 100%
+    );
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 1.25rem;
+    gap: 0.5rem;
+    transition: background 0.4s ease;
+  }
+
+  .community-card:hover .community-card-overlay {
+    background: linear-gradient(
+      to top,
+      rgba(5, 5, 15, 0.95) 0%,
+      rgba(5, 5, 15, 0.55) 50%,
+      rgba(5, 5, 15, 0.05) 100%
+    );
+  }
+
+  .community-tag {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: linear-gradient(135deg, var(--primary), #a00028);
+    color: #fff;
+    align-self: flex-start;
+  }
+
+  .tag-cosplay-race { background: linear-gradient(135deg, #DC143C, #a00028); }
+  .tag-cosplay      { background: linear-gradient(135deg, #6b3fa0, #4a1a80); }
+  .tag-dance        { background: linear-gradient(135deg, #0a7ea4, #055a7a); }
+  .tag-fans         { background: linear-gradient(135deg, #1a7a3f, #0f5028); }
+
+  .community-card-title {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #fff;
+    margin: 0;
+    line-height: 1.3;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+  }
+
+  .community-card-desc {
+    font-size: 0.77rem;
+    color: rgba(255,255,255,0.7);
+    line-height: 1.6;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .community-card-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.55);
+    font-weight: 600;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(255,255,255,0.1);
+  }
+
+  @media (max-width: 1024px) {
+    .community-events-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 600px) {
+    .community-events-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .showcase-grid {
+      grid-template-columns: 1fr;
+      gap: var(--spacing-lg);
+    }
+
+    .showcase-item {
+      aspect-ratio: 5 / 7;
+    }
+
+    .race-banner {
+      min-height: 300px;
+    }
+
+    .race-banner-content {
+      padding: var(--spacing-lg);
+    }
+
+    .race-banner-title {
+      font-size: 1.5rem;
+    }
+
+    .race-detail-item.prize {
+      font-size: 1.25rem8px) {
+    .showcase-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .showcase-item {
+      height: 350px;
+    }
+
+    .race-banner {
+      grid-template-columns: 1fr;
+    }
+
+    .race-banner-image {
+      min-height: 200px;
+    }
+
+    .timeline-list {
+      padding-left: 40px;
+    }
+
+    .timeline-marker {
+      left: -38px;
+    }
+
+    .timeline-content {
+      grid-template-columns: 1fr;
+    }
+
+    .timeline-image {
+      height: 200px;
+    }
+
+    .podium {
+      grid-template-columns: 1fr;
+    }
+
+    .podium-item[data-rank="1"],
+    .podium-item[data-rank="2"],
+    .podium-item[data-rank="3"] {
+      order: initial;
+      transform: scale(1);
+    }
+  }
+
+  /* Race Cards */
+  .race-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-md);
+  }
+  
+  .race-card {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .race-image {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16/9;
+    overflow: hidden;
+  }
+  
+  .race-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .race-badge {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background: var(--secondary);
+    color: var(--bg-dark);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.9rem;
+  }
+  
+  .race-info {
+    padding: var(--spacing-md);
+  }
+  
+  .race-info h3 {
+    font-size: 1.25rem;
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  .race-meta {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-xs);
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+  
+  .race-date {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin-bottom: var(--spacing-xs);
+  }
+  
+  .race-prize {
+    color: var(--primary);
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
+  
+  /* News Grid */
+  .news-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: var(--spacing-md);
+  }
+  
+  .news-card {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .news-card img {
+    width: 100%;
+    aspect-ratio: 16/9;
+    object-fit: cover;
+  }
+  
+  .news-content {
+    padding: var(--spacing-md);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .news-category {
+    display: inline-block;
+    background: var(--primary);
+    color: var(--text-primary);
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: var(--spacing-sm);
+    width: fit-content;
+  }
+  
+  .news-content h3 {
+    font-size: 1.2rem;
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  .news-content p {
+    flex: 1;
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  .news-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    padding-top: var(--spacing-sm);
+    border-top: 1px solid var(--border);
+  }
+  
+  /* Stats Grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-md);
+  }
+  
+  .stat-card {
+    text-align: center;
+    padding: var(--spacing-md);
+    position: relative;
+  }
+  
+  .stat-rank {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 40px;
+    height: 40px;
+    background: var(--primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
+  
+  .stat-card img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 12px;
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  .stat-card h3 {
+    margin-bottom: var(--spacing-xs);
+  }
+  
+  .stat-wins {
+    color: var(--secondary);
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin-bottom: var(--spacing-md);
+  }
+  
+  @media (max-width: 768px) {
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .stats-strip-item { padding: 0.4rem 1.25rem; }
+    .stats-num { font-size: 1.3rem; }
+    .about-strip-inner { grid-template-columns: 1fr; }
+    .about-strip-visual { display: none; }
+  }
+
+  @media (max-width: 480px) {
+    .stats-strip-divider { display: none; }
+    .stats-strip-inner { gap: 0.5rem 1.5rem; justify-content: space-around; }
+  }
+</style>

@@ -1,0 +1,168 @@
+---
+interface GalleryItem {
+  type: 'image' | 'video';
+  src: string;
+  alt: string;
+  thumbnail?: string;
+}
+
+interface Props {
+  items: GalleryItem[];
+  columns?: 2 | 3 | 4;
+}
+
+const { items, columns = 3 } = Astro.props;
+---
+
+<div class="gallery" data-columns={columns}>
+  {items.map((item, index) => (
+    <div class="gallery-item" data-index={index}>
+      {item.type === 'image' ? (
+        <img 
+          src={item.src} 
+          alt={item.alt} 
+          loading="lazy"
+          class="gallery-image"
+        />
+      ) : (
+        <div class="gallery-video">
+          <img 
+            src={item.thumbnail || item.src} 
+            alt={item.alt}
+            loading="lazy"
+          />
+          <div class="play-button">
+            <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+              <circle cx="30" cy="30" r="30" fill="rgba(212, 22, 28, 0.9)" />
+              <path d="M23 18L40 30L23 42V18Z" fill="white" />
+            </svg>
+          </div>
+        </div>
+      )}
+    </div>
+  ))}
+</div>
+
+<style>
+  .gallery {
+    display: grid;
+    gap: var(--spacing-md);
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .gallery[data-columns="2"] {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .gallery[data-columns="4"] {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  .gallery-item {
+    position: relative;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: 16px;
+    background: var(--bg-card);
+    cursor: pointer;
+    transition: all var(--transition-medium);
+    border: 3px solid transparent;
+    box-shadow: var(--shadow-md);
+  }
+  
+  .gallery-item::before {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    background: linear-gradient(135deg, var(--primary), var(--accent), var(--accent-orange));
+    border-radius: 16px;
+    opacity: 0;
+    transition: opacity var(--transition-medium);
+    z-index: -1;
+  }
+  
+  .gallery-item:hover {
+    transform: translateY(-8px) scale(1.03);
+    z-index: 10;
+    box-shadow: var(--shadow-xl);
+  }
+  
+  .gallery-item:hover::before {
+    opacity: 1;
+  }
+  
+  .gallery-image,
+  .gallery-video img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition-slow);
+  }
+  
+  .gallery-item:hover .gallery-image,
+  .gallery-item:hover .gallery-video img {
+    transform: scale(1.1) rotate(2deg);
+    filter: brightness(1.1);
+  }
+  
+  .gallery-video {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .play-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: all var(--transition-medium);
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
+  }
+  
+  .play-button svg circle {
+    fill: var(--accent-orange);
+    transition: fill var(--transition-fast);
+  }
+  
+  .gallery-item:hover .play-button {
+    transform: translate(-50%, -50%) scale(1.2) rotate(90deg);
+  }
+  
+  .gallery-item:hover .play-button svg circle {
+    fill: var(--primary);
+  }
+  
+  @media (max-width: 1024px) {
+    .gallery[data-columns="4"] {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .gallery,
+    .gallery[data-columns="3"],
+    .gallery[data-columns="4"] {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .gallery,
+    .gallery[data-columns="2"],
+    .gallery[data-columns="3"],
+    .gallery[data-columns="4"] {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  // Simple lightbox functionality
+  document.querySelectorAll('.gallery-item').forEach(item => {
+    item.addEventListener('click', () => {
+      // You can add lightbox/modal functionality here
+      console.log('Gallery item clicked:', item.dataset.index);
+    });
+  });
+</script>

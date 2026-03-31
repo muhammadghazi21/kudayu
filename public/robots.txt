@@ -1,0 +1,7 @@
+# Robots.txt for Kudayu
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://kudayu.pages.dev/sitemap-index.xml

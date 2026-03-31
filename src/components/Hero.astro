@@ -1,0 +1,187 @@
+---
+interface Props {
+  title: string;
+  subtitle: string;
+  image: string;
+  ctaText?: string;
+  ctaLink?: string;
+}
+
+const { 
+  title, 
+  subtitle, 
+  image,
+  ctaText = 'Jelajahi Sekarang',
+  ctaLink = '/horses'
+} = Astro.props;
+---
+
+<section class="hero">
+  <div class="hero-background">
+    <iframe 
+      src="https://www.youtube.com/embed/Xx8C4O8FKVQ?autoplay=1&mute=1&loop=1&playlist=Xx8C4O8FKVQ&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1"
+      title="Hero background video"
+      frameborder="0"
+      allow="autoplay; encrypted-media"
+    ></iframe>
+    <div class="hero-overlay"></div>
+  </div>
+  
+  <div class="hero-content container">
+    <h1 class="hero-title fade-in">{title}</h1>
+    <p class="hero-subtitle fade-in">{subtitle}</p>
+    <div class="hero-cta fade-in">
+      <a href={ctaLink} class="btn btn-primary">{ctaText}</a>
+      <a href="/races" class="btn btn-secondary">Jadwal Race</a>
+    </div>
+  </div>
+  
+  <div class="hero-scroll">
+    <span>Scroll</span>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <polyline points="6 9 12 15 18 9"></polyline>
+    </svg>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    height: calc(100vh - 80px);
+    min-height: 600px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    overflow: hidden;
+  }
+  
+  .hero-background {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+  
+  .hero-background iframe {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100vw;
+    height: 56.25vw; /* 16:9 aspect ratio */
+    min-height: 100%;
+    min-width: 177.77vh; /* 16:9 aspect ratio */
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+  
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+
+  .hero-overlay::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, 0.3) 40%,
+      rgba(15, 15, 15, 0.75) 70%,
+      rgba(20, 20, 20, 0.92) 100%
+    );
+    backdrop-filter: blur(1px);
+  }
+  
+  .hero-content {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    max-width: 1000px;
+    padding-bottom: var(--spacing-2xl);
+  }
+  
+  .hero-title {
+    font-size: clamp(2rem, 5vw, 4rem);
+    font-weight: 800;
+    margin-bottom: var(--spacing-md);
+    color: #FFFFFF;
+    text-shadow: 
+      0 2px 8px rgba(0, 0, 0, 0.3),
+      0 0 30px rgba(220, 20, 60, 0.15);
+    letter-spacing: -0.02em;
+    position: relative;
+  }
+  
+  .hero-subtitle {
+    font-size: clamp(1rem, 2vw, 1.3rem);
+    color: rgba(255, 255, 255, 0.95);
+    margin-bottom: var(--spacing-lg);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    line-height: 1.7;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+  }
+  
+  .hero-cta {
+    display: flex;
+    gap: var(--spacing-md);
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .hero-scroll {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--primary);
+    font-size: 0.9rem;
+    font-weight: 600;
+    animation: bounce 2s infinite;
+    cursor: pointer;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+  }
+  
+  @keyframes bounce {
+    0%, 100% {
+      transform: translateX(-50%) translateY(0);
+    }
+    50% {
+      transform: translateX(-50%) translateY(10px);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .hero {
+      height: calc(100vh - 60px);
+      min-height: 500px;
+    }
+    .hero-content {
+      padding-bottom: var(--spacing-xl);
+      max-width: 95%;
+    }
+
+    .hero-title {
+      font-size: clamp(1.75rem, 8vw, 2.5rem);
+    }
+
+    .hero-subtitle {
+      font-size: clamp(0.9rem, 4vw, 1.1rem);
+      margin-bottom: var(--spacing-md);
+    }    
+    .hero-cta {
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .hero-cta .btn {
+      width: 100%;
+      max-width: 300px;
+    }
+  }
+</style>

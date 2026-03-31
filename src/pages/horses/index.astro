@@ -1,0 +1,271 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+import HorseCard from '@/components/HorseCard.astro';
+import { horses } from '@/data/horses';
+---
+
+<Layout 
+  title="Daftar Kuda" 
+  description="Jelajahi profil lengkap kuda-kuda pacuan terbaik. Statistik, pencapaian, dan informasi detail setiap kuda."
+>
+  <Header />
+  
+  <main>
+    <section class="page-header">
+      <div class="container">
+        <h1>🐴 Profil Kuda Pacuan</h1>
+        <p>Temukan kuda favorit Anda dan pelajari statistik lengkap mereka</p>
+      </div>
+    </section>
+    
+    <section class="section">
+      <div class="container">
+        <!-- Filter Section -->
+        <div class="filter-bar">
+          <div class="filter-group">
+            <label for="sort">Urutkan:</label>
+            <select id="sort" class="filter-select">
+              <option value="name">Nama (A-Z)</option>
+              <option value="wins">Kemenangan Terbanyak</option>
+              <option value="age">Umur</option>
+              <option value="featured">Featured</option>
+            </select>
+          </div>
+          
+          <div class="search-box">
+            <input 
+              type="text" 
+              id="search" 
+              placeholder="Cari kuda..." 
+              class="search-input"
+            />
+            <span class="search-icon">🔍</span>
+          </div>
+        </div>
+        
+        <!-- Horses Grid -->
+        <div class="grid grid-3" id="horses-grid">
+          {horses.map(horse => (
+            <HorseCard horse={horse} />
+          ))}
+        </div>
+        
+        <!-- No Results -->
+        <div id="no-results" style="display: none; text-align: center; padding: 3rem;">
+          <h3>Tidak ada kuda ditemukan</h3>
+          <p>Coba kata kunci pencarian lain</p>
+        </div>
+      </div>
+    </section>
+  </main>
+  
+  <Footer />
+</Layout>
+
+<style>
+  .page-header {
+    position: relative;
+    background-image: url('/bg-silver-paint.jpeg');
+    background-size: cover;
+    background-position: center;
+    padding: var(--spacing-xl) 0;
+    text-align: center;
+    margin-bottom: var(--spacing-xl);
+    overflow: hidden;
+  }
+  
+  .page-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(220, 20, 60, 0.65) 0%, rgba(30, 10, 10, 0.75) 100%);
+    z-index: 0;
+  }
+  
+  .page-header > * {
+    position: relative;
+    z-index: 1;
+  }
+  
+  .page-header .container {
+    position: relative;
+    z-index: 1;
+  }
+  
+  .page-header h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    margin-bottom: var(--spacing-sm);
+    background: linear-gradient(
+      90deg,
+      #A8A8A8 0%,
+      #D8D8D8 20%,
+      #FFFFFF 38%,
+      #F0F0F0 42%,
+      #C0C0C0 55%,
+      #E8E8E8 70%,
+      #FFFFFF 82%,
+      #B0B0B0 100%
+    );
+    background-size: 300% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: glossySweep 10s linear infinite;
+  }
+  
+  @keyframes glossySweep {
+    0% { background-position: 0% center; }
+    100% { background-position: 300% center; }
+}
+  
+  .page-header p {
+    font-size: 1.2rem;
+    background: linear-gradient(
+      90deg,
+      #909090 0%,
+      #C8C8C8 25%,
+      #F5F5F5 45%,
+      #C8C8C8 55%,
+      #909090 100%
+    );
+    background-size: 300% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: glossySweep 12s linear infinite;
+  }
+  
+  .filter-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-xl);
+    gap: var(--spacing-md);
+    flex-wrap: wrap;
+  }
+  
+  .filter-group {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+  
+  .filter-group label {
+    font-weight: 600;
+  }
+  
+  .filter-select {
+    padding: 0.75rem 1rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: border-color var(--transition-fast);
+  }
+  
+  .filter-select:focus {
+    outline: none;
+    border-color: var(--primary);
+  }
+  
+  .search-box {
+    position: relative;
+    flex: 1;
+    max-width: 400px;
+  }
+  
+  .search-input {
+    width: 100%;
+    padding: 0.75rem 3rem 0.75rem 1rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: border-color var(--transition-fast);
+  }
+  
+  .search-input:focus {
+    outline: none;
+    border-color: var(--primary);
+  }
+  
+  .search-icon {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+  }
+  
+  @media (max-width: 768px) {
+    .filter-bar {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    
+    .search-box {
+      max-width: 100%;
+    }
+  }
+</style>
+
+<script>
+  // Client-side filtering and sorting
+  const horsesData = document.querySelectorAll('.horse-card');
+  const sortSelect = document.getElementById('sort') as HTMLSelectElement;
+  const searchInput = document.getElementById('search') as HTMLInputElement;
+  const horsesGrid = document.getElementById('horses-grid');
+  const noResults = document.getElementById('no-results');
+  
+  function filterAndSort() {
+    const searchTerm = searchInput.value.toLowerCase();
+    const sortBy = sortSelect.value;
+    
+    let visibleCount = 0;
+    
+    // Convert NodeList to Array for sorting
+    const horsesArray = Array.from(horsesData);
+    
+    // Filter first
+    horsesArray.forEach(card => {
+      const horseName = card.querySelector('.card-title')?.textContent?.toLowerCase() || '';
+      const horseBreed = card.querySelector('.card-breed')?.textContent?.toLowerCase() || '';
+      
+      if (horseName.includes(searchTerm) || horseBreed.includes(searchTerm)) {
+        (card as HTMLElement).style.display = '';
+        visibleCount++;
+      } else {
+        (card as HTMLElement).style.display = 'none';
+      }
+    });
+    
+    // Show/hide no results message
+    if (noResults) {
+      noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+    }
+    
+    // Simple sort implementation (would need more data attributes for full functionality)
+    if (sortBy === 'name') {
+      horsesArray.sort((a, b) => {
+        const nameA = a.querySelector('.card-title')?.textContent || '';
+        const nameB = b.querySelector('.card-title')?.textContent || '';
+        return nameA.localeCompare(nameB);
+      });
+    }
+    
+    // Re-append sorted elements
+    horsesArray.forEach(card => {
+      if (horsesGrid && (card as HTMLElement).style.display !== 'none') {
+        horsesGrid.appendChild(card);
+      }
+    });
+  }
+  
+  sortSelect?.addEventListener('change', filterAndSort);
+  searchInput?.addEventListener('input', filterAndSort);
+</script>

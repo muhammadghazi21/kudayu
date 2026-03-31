@@ -1,0 +1,194 @@
+---
+const navItems = [
+  { name: 'Beranda', href: '/' },
+  { name: 'Kuda', href: '/horses' },
+  { name: 'Races', href: '/races' },
+  { name: 'Berita', href: '/news' },
+  { name: 'Galeri', href: '/gallery' },
+  { name: 'Komunitas', href: '/community' },
+];
+
+const currentPath = Astro.url.pathname;
+---
+
+<header class="header">
+  <nav class="nav container">
+    <a href="/" class="logo">
+      <span class="logo-icon">🐴</span>
+      <span class="logo-text">KUDAYU</span>
+    </a>
+    
+    <button class="nav-toggle" aria-label="Toggle navigation">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    
+    <ul class="nav-menu">
+      {navItems.map(item => (
+        <li>
+          <a 
+            href={item.href} 
+            class:list={['nav-link', { active: currentPath === item.href }]}
+          >
+            {item.name}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+</header>
+
+<style>
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 2px solid rgba(220, 20, 60, 0.2);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  }
+  
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem var(--spacing-md);
+    max-height: 80px;
+  }
+  
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: transform var(--transition-fast);
+  }
+  
+  .logo:hover {
+    transform: scale(1.08) rotate(-2deg);
+    color: var(--primary);
+    animation: float 2s ease-in-out infinite;
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-5px) rotate(-2deg); }
+  }
+  
+  .logo-icon {
+    font-size: 2rem;
+  }
+  
+  .logo-text {
+    letter-spacing: 1px;
+  }
+  
+  .nav-toggle {
+    display: none;
+    flex-direction: column;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+  }
+  
+  .nav-toggle span {
+    width: 25px;
+    height: 3px;
+    background: var(--text-primary);
+    margin: 3px 0;
+    transition: var(--transition-fast);
+    border-radius: 3px;
+  }
+  
+  .nav-menu {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+    margin: 0;
+  }
+  
+  .nav-link {
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 1rem;
+    transition: color var(--transition-fast);
+    position: relative;
+  }
+  
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    transition: width var(--transition-medium);
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(220, 20, 60, 0.5);
+  }
+  
+  .nav-link:hover,
+  .nav-link.active {
+    color: var(--text-primary);
+  }
+  
+  .nav-link:hover::after,
+  .nav-link.active::after {
+    width: 100%;
+  }
+  
+  @media (max-width: 768px) {
+    .nav-toggle {
+      display: flex;
+    }
+    
+    .nav-menu {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      flex-direction: column;
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem;
+      gap: 1rem;
+      transform: translateY(-100%);
+      opacity: 0;
+      pointer-events: none;
+      transition: all var(--transition-medium);
+    }
+    
+    .nav-menu.active {
+      transform: translateY(0);
+      opacity: 1;
+      pointer-events: all;
+    }
+  }
+</style>
+
+<script>
+  // Mobile menu toggle
+  const navToggle = document.querySelector('.nav-toggle');
+  const navMenu = document.querySelector('.nav-menu');
+  
+  navToggle?.addEventListener('click', () => {
+    navMenu?.classList.toggle('active');
+    navToggle.classList.toggle('active');
+  });
+  
+  // Close menu when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!navToggle?.contains(e.target as Node) && !navMenu?.contains(e.target as Node)) {
+      navMenu?.classList.remove('active');
+      navToggle?.classList.remove('active');
+    }
+  });
+</script>

@@ -1,0 +1,781 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+import {
+  communityEvents as events,
+  getOfflineEvents,
+  getOnlineEvents,
+  type CommunityEvent,
+  type EventStatus,
+  type EventMode,
+} from '@/data/community';
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const _deprecatedInlineData = [
+  // ── Offline & Hybrid ──────────────────────────────────────
+  {
+    title: 'Cosplay Race 2026',
+    category: 'Cosplay Race',
+    categoryColor: '#DC143C',
+    status: 'upcoming',
+    mode: 'offline',
+    date: 'Maret 2026',
+    location: 'Lapangan Sultan Agung, Yogyakarta',
+    image: '/event-cosplay-race.jpg',
+    desc: 'Kompetisi cosplay sambil berlomba di lintasan pacuan kuda sungguhan. Padukan kostum terbaik karakter Uma Musume dengan semangat pacuan kuda Indonesia.',
+    prize: 'Total Rp 15.000.000',
+  },
+  {
+    title: 'Uma Cosplay Festival',
+    category: 'Cosplay',
+    categoryColor: '#9B59B6',
+    status: 'upcoming',
+    mode: 'offline',
+    date: 'April 2026',
+    location: 'Jakarta Convention Center',
+    image: '/event-cosplay.jpg',
+    desc: 'Pamerkan kostum karakter Uma Musume favoritmu dan bersaing memperebutkan gelar Best Costume. Ratusan cosplayer dari seluruh Indonesia hadir.',
+    prize: 'Total Rp 20.000.000',
+  },
+  {
+    title: 'Uma Dance Battle',
+    category: 'Dance',
+    categoryColor: '#2980B9',
+    status: 'upcoming',
+    mode: 'offline',
+    date: 'Mei 2026',
+    location: 'GOR Ngurah Rai, Bali',
+    image: '/event-dance.jpg',
+    desc: 'Battle dance bertema Uma Musume — koreografi seru, energi penuh, dan penampilan spesial dari komunitas dance Indonesia.',
+    prize: 'Total Rp 10.000.000',
+  },
+  {
+    title: 'Fans Gathering Nasional',
+    category: 'Fans Gathering',
+    categoryColor: '#27AE60',
+    status: 'upcoming',
+    mode: 'hybrid',
+    date: 'Juni 2026',
+    location: 'Surabaya & Online',
+    image: '/event-fans-gathering.jpg',
+    desc: 'Pertemuan akbar para penggemar Uma Musume dan pacuan kuda Indonesia. Meet-up, games, lelang merchandise eksklusif, dan surprise guest istimewa.',
+    prize: undefined,
+  },
+  {
+    title: 'Kompetisi Foto Kuda Pacuan',
+    category: 'Foto Kompetisi',
+    categoryColor: '#E67E22',
+    status: 'upcoming',
+    mode: 'offline',
+    date: 'Juli 2026',
+    location: 'Berbagai sirkuit pacuan, seluruh Indonesia',
+    image: '/stadion-1.png',
+    desc: 'Abadikan momen terbaik dari arena pacuan kuda Indonesia. Kategori: Aksi Balapan, Portrait Kuda, Ekspresi Joki, dan Suasana Stadion.',
+    prize: 'Total Rp 25.000.000',
+  },
+  {
+    title: 'Kuda Pacu Street Festival',
+    category: 'Festival',
+    categoryColor: '#C0392B',
+    status: 'upcoming',
+    mode: 'offline',
+    date: 'Agustus 2026',
+    location: 'Alun-Alun Kota Yogyakarta',
+    image: '/stadion-2.png',
+    desc: 'Festival jalanan bertema pacuan kuda — pameran seni, pertunjukan musik, bazar merchandise, dan sesi meet & greet dengan joki dan pelatih ternama.',
+    prize: undefined,
+  },
+  {
+    title: 'Regional Fan Meetup — Jawa Barat',
+    category: 'Meetup',
+    categoryColor: '#16A085',
+    status: 'finished',
+    mode: 'offline',
+    date: 'Februari 2026',
+    location: 'Bandung',
+    image: '/stadion-3.png',
+    desc: 'Pertemuan komunitas penggemar pacuan kuda wilayah Jawa Barat. Sesi diskusi, nonton bareng highlight race, dan kunjungan ke stable lokal.',
+    prize: undefined,
+  },
+
+  // ── Online ──────────────────────────────────────────────
+  {
+    title: 'Kompetisi Fanart Uma Musume',
+    category: 'Fanart',
+    categoryColor: '#8E44AD',
+    status: 'ongoing',
+    mode: 'online',
+    date: '1–31 Maret 2026',
+    location: 'Online — Instagram & Twitter/X',
+    image: '/kuda-1.png',
+    desc: 'Kirimkan karya fanart karakter kuda pacuan dengan tema "Victory Lap". Semua gaya seni diterima — digital, tradisional, 3D. Voting oleh komunitas.',
+    prize: 'Total Rp 8.000.000 + Merchandise',
+  },
+  {
+    title: 'Lomba Foto Kuda Asli',
+    category: 'Foto Kompetisi',
+    categoryColor: '#E67E22',
+    status: 'ongoing',
+    mode: 'online',
+    date: '15 Feb – 15 Apr 2026',
+    location: 'Online — kudayu.id/submit',
+    image: '/kuda-asli-2.jpg',
+    desc: 'Abadikan keindahan kuda pacu Indonesia di lintasan maupun kandang. Kirim foto melo Instagram dengan tagar #KudayuLombaFoto untuk ikut serta.',
+    prize: 'Rp 5.000.000 + Feature di Website',
+  },
+  {
+    title: 'Uma Quiz Night',
+    category: 'Kuis Online',
+    categoryColor: '#2980B9',
+    status: 'upcoming',
+    mode: 'online',
+    date: 'Setiap Jumat, Maret 2026',
+    location: 'Online — Discord Kudayu',
+    image: '/kuda-2.png',
+    desc: 'Adu pengetahuan soal pacuan kuda dan Uma Musume! Kuis interaktif via Discord, hadiah poin XP dan merchandise eksklusif untuk juara.',
+    prize: 'Merchandise & XP Points',
+  },
+  {
+    title: 'Race Prediction League',
+    category: 'Prediksi',
+    categoryColor: '#F39C12',
+    status: 'upcoming',
+    mode: 'online',
+    date: 'Setiap event race 2026',
+    location: 'Online — Aplikasi Kudayu',
+    image: '/kuda-3.jpg',
+    desc: 'Prediksi urutan finish setiap race nasional dan kumpulkan poin. Top prediktor musim 2026 mendapatkan merchandise spesial dan akses eksklusif.',
+    prize: 'Merchandise + Akses Eksklusif',
+  },
+  {
+    title: 'Komunitas Discord Kudayu',
+    category: 'Komunitas',
+    categoryColor: '#5865F2',
+    status: 'ongoing',
+    mode: 'online',
+    date: 'Bergabung kapan saja',
+    location: 'Online — Discord',
+    image: '/cs-1.jpg',
+    desc: 'Server Discord resmi Kudayu — diskusi race, berbagi tips judi bertanggung jawab, galeri fanart, kanal live race, dan channel khusus Jateng Derby 2026.',
+    prize: undefined,
+  },
+];
+
+const offlineEvents = getOfflineEvents();
+const onlineEvents  = getOnlineEvents();
+
+const statusLabel = {
+  upcoming: { text: 'Segera',      bg: 'rgba(52,152,219,0.15)',  color: '#3498db', border: 'rgba(52,152,219,0.3)'  },
+  ongoing:  { text: 'Berlangsung', bg: 'rgba(39,174,96,0.15)',   color: '#2ecc71', border: 'rgba(39,174,96,0.3)'   },
+  finished: { text: 'Selesai',     bg: 'rgba(149,165,166,0.15)', color: '#95a5a6', border: 'rgba(149,165,166,0.3)' },
+};
+
+const modeLabel = {
+  offline: { icon: '📍', text: 'Offline' },
+  online:  { icon: '💻', text: 'Online'  },
+  hybrid:  { icon: '🌐', text: 'Hybrid'  },
+};
+---
+
+<Layout
+  title="Komunitas"
+  description="Event komunitas Kudayu — kompetisi fanart, foto kuda, cosplay race, fans gathering, dan banyak lagi."
+>
+  <Header />
+
+  <main>
+
+    <!-- ── Hero ── -->
+    <section class="comm-hero">
+      <div class="comm-hero-bg">
+        <img src="/event-fans-gathering.jpg" alt="Komunitas Kudayu" />
+        <div class="comm-hero-overlay"></div>
+      </div>
+      <div class="container comm-hero-content">
+        <div class="comm-hero-eyebrow">🐴 KUDAYU COMMUNITY</div>
+        <h1>Bergabung & Berkarya<br />Bersama Komunitas</h1>
+        <p>Event offline, kompetisi online, fans gathering, cosplay race, dan banyak lagi — semua untuk penggemar pacuan kuda Indonesia.</p>
+        <div class="comm-hero-stats">
+          <div class="hero-stat">
+            <span class="hero-stat-num">{events.length}+</span>
+            <span class="hero-stat-label">Event 2026</span>
+          </div>
+          <div class="hero-stat-divider"></div>
+          <div class="hero-stat">
+            <span class="hero-stat-num">{onlineEvents.length}</span>
+            <span class="hero-stat-label">Kompetisi Online</span>
+          </div>
+          <div class="hero-stat-divider"></div>
+          <div class="hero-stat">
+            <span class="hero-stat-num">5K+</span>
+            <span class="hero-stat-label">Anggota Aktif</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Offline / Hybrid Events ── -->
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-eyebrow">📍 Temui Kami Langsung</div>
+          <h2 class="section-heading">Event Offline & Hybrid</h2>
+          <p class="section-sub">Festival, kompetisi, dan pertemuan komunitas yang bisa kamu hadiri langsung.</p>
+        </div>
+
+        <div class="events-grid">
+          {offlineEvents.map((ev) => {
+            const s = statusLabel[ev.status];
+            const m = modeLabel[ev.mode];
+            return (
+              <a href={`/community/${ev.slug}`} class="event-card-link">
+              <article class="event-card">
+                <div class="event-card-img">
+                  <img src={ev.image} alt={ev.title} loading="lazy" />
+                  <div class="event-card-img-overlay"></div>
+                  <!-- category + mode badges -->
+                  <div class="event-badges-top">
+                    <span class="event-cat-badge" style={`background:${ev.categoryColor}22;color:${ev.categoryColor};border-color:${ev.categoryColor}44`}>
+                      {ev.category}
+                    </span>
+                    <span class="event-mode-badge">{m.icon} {m.text}</span>
+                  </div>
+                  <!-- status badge -->
+                  <span class="event-status-badge" style={`background:${s.bg};color:${s.color};border-color:${s.border}`}>
+                    {s.text}
+                  </span>
+                </div>
+
+                <div class="event-card-body">
+                  <h3 class="event-card-title">{ev.title}</h3>
+                  <p class="event-card-desc">{ev.desc}</p>
+
+                  <div class="event-card-meta">
+                    <span class="event-meta-item">🗓️ {ev.date}</span>
+                    <span class="event-meta-item">📍 {ev.location}</span>
+                    {ev.prize && <span class="event-meta-prize">🏆 {ev.prize}</span>}
+                  </div>
+                </div>
+              </article>
+              </a>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Divider ── -->
+    <div class="section-divider">
+      <div class="divider-line"></div>
+      <span class="divider-label">💻 Online Events</span>
+      <div class="divider-line"></div>
+    </div>
+
+    <!-- ── Online Events ── -->
+    <section class="section section-online">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-eyebrow">🌐 Dari Mana Saja</div>
+          <h2 class="section-heading">Kompetisi & Komunitas Online</h2>
+          <p class="section-sub">Ikut kompetisi, saingan teman, dan bergabung ke komunitas Discord kapan saja dan dari mana saja.</p>
+        </div>
+
+        <div class="online-grid">
+          {onlineEvents.map((ev) => {
+            const s = statusLabel[ev.status];
+            const m = modeLabel[ev.mode];
+            return (
+              <a href={`/community/${ev.slug}`} class="event-card-link">
+              <article class="online-card">
+                <div class="online-card-accent" style={`background:${ev.categoryColor}`}></div>
+                <div class="online-card-img">
+                  <img src={ev.image} alt={ev.title} loading="lazy" />
+                </div>
+                <div class="online-card-body">
+                  <div class="online-card-top">
+                    <span class="event-cat-badge" style={`background:${ev.categoryColor}22;color:${ev.categoryColor};border-color:${ev.categoryColor}44`}>
+                      {ev.category}
+                    </span>
+                    <span class="event-status-badge" style={`background:${s.bg};color:${s.color};border-color:${s.border}`}>
+                      {s.text}
+                    </span>
+                  </div>
+                  <h3 class="online-card-title">{ev.title}</h3>
+                  <p class="online-card-desc">{ev.desc}</p>
+                  <div class="event-card-meta">
+                    <span class="event-meta-item">🗓️ {ev.date}</span>
+                    <span class="event-meta-item">{m.icon} {ev.location}</span>
+                    {ev.prize && <span class="event-meta-prize">🏆 {ev.prize}</span>}
+                  </div>
+                </div>
+              </article>
+              </a>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+
+    <!-- ── CTA Banner ── -->
+    <section class="cta-section">
+      <div class="container cta-inner">
+        <div class="cta-text">
+          <h2>Punya ide event atau mau kolaborasi?</h2>
+          <p>Komunitas Kudayu terbuka untuk semua ide. Hubungi kami atau bergabung ke server Discord untuk berdiskusi langsung.</p>
+        </div>
+        <div class="cta-actions">
+          <a href="https://discord.gg/kudayu" class="btn btn-primary" target="_blank" rel="noopener">💬 Gabung Discord</a>
+          <a href="/news" class="btn btn-outline">📰 Baca Berita</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <Footer />
+</Layout>
+
+<style>
+  /* ── Hero ── */
+  .comm-hero {
+    position: relative;
+    min-height: 520px;
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+  }
+  .comm-hero-bg {
+    position: absolute;
+    inset: 0;
+  }
+  .comm-hero-bg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 30%;
+  }
+  .comm-hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top,
+      rgba(12, 4, 8, 0.97) 0%,
+      rgba(30, 8, 16, 0.80) 40%,
+      rgba(30, 8, 16, 0.35) 100%
+    );
+  }
+  .comm-hero-content {
+    position: relative;
+    z-index: 2;
+    padding-bottom: var(--spacing-2xl);
+    padding-top: var(--spacing-2xl);
+    max-width: 760px;
+  }
+  .comm-hero-eyebrow {
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--secondary);
+    margin-bottom: 0.75rem;
+  }
+  .comm-hero-content h1 {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    line-height: 1.15;
+    color: #fff;
+    margin-bottom: var(--spacing-sm);
+    text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+  }
+  .comm-hero-content > p {
+    font-size: 1.1rem;
+    color: rgba(255,255,255,0.78);
+    line-height: 1.7;
+    margin-bottom: var(--spacing-lg);
+    max-width: 580px;
+  }
+  .comm-hero-stats {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .hero-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+  .hero-stat-num {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--secondary);
+    line-height: 1;
+  }
+  .hero-stat-label {
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.55);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+  }
+  .hero-stat-divider {
+    width: 1px;
+    height: 36px;
+    background: rgba(255,255,255,0.18);
+  }
+
+  /* ── Section headers ── */
+  .section-header {
+    text-align: center;
+    margin-bottom: var(--spacing-xl);
+  }
+  .section-eyebrow {
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+  }
+  .section-heading {
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    background: linear-gradient(135deg, var(--primary), var(--accent-orange));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.6rem;
+  }
+  .section-sub {
+    color: var(--text-muted);
+    font-size: 1rem;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+
+  /* ── Offline events grid ── */
+  .events-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-md);
+  }
+
+  .event-card {
+    background: var(--bg-card);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform var(--transition-medium), box-shadow var(--transition-medium), border-color var(--transition-medium);
+  }
+  .event-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-lg);
+    border-color: rgba(220,20,60,0.2);
+  }
+
+  .event-card-img {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+  }
+  .event-card-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition-slow);
+  }
+  .event-card:hover .event-card-img img { transform: scale(1.06); }
+  .event-card-img-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.30) 0%, transparent 60%);
+  }
+
+  .event-badges-top {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+  .event-cat-badge {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.25rem 0.6rem;
+    border-radius: 20px;
+    border: 1px solid transparent;
+    letter-spacing: 0.03em;
+    backdrop-filter: blur(6px);
+    background: rgba(0,0,0,0.35);
+  }
+  .event-mode-badge {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.25rem 0.6rem;
+    border-radius: 20px;
+    background: rgba(0,0,0,0.42);
+    color: rgba(255,255,255,0.88);
+    backdrop-filter: blur(6px);
+  }
+  .event-status-badge {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.25rem 0.65rem;
+    border-radius: 20px;
+    border: 1px solid transparent;
+    backdrop-filter: blur(6px);
+  }
+
+  .event-card-body {
+    padding: var(--spacing-md);
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    flex: 1;
+  }
+  .event-card-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    line-height: 1.3;
+  }
+  .event-card-desc {
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    line-height: 1.65;
+    margin: 0;
+    flex: 1;
+  }
+  .event-card-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    margin-top: 0.2rem;
+    padding-top: 0.65rem;
+    border-top: 1px solid var(--border-light);
+  }
+  .event-meta-item {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+  .event-meta-prize {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--accent-orange);
+    line-height: 1.4;
+  }
+
+  /* ── Divider ── */
+  .section-divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0 var(--spacing-md);
+    max-width: var(--max-width);
+    margin: 0 auto;
+  }
+  .divider-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .divider-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+  }
+
+  /* ── Online section background ── */
+  .section-online {
+    background: var(--bg-gradient-pink);
+  }
+
+  /* ── Online grid ── */
+  .online-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-md);
+  }
+
+  .online-card {
+    background: var(--bg-card);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    position: relative;
+    transition: transform var(--transition-medium), box-shadow var(--transition-medium), border-color var(--transition-medium);
+  }
+  .online-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+    border-color: rgba(220,20,60,0.18);
+  }
+  .online-card-accent {
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    width: 4px;
+    border-radius: 0;
+  }
+
+  .online-card-img {
+    position: relative;
+    overflow: hidden;
+    border-right: 1px solid var(--border-light);
+  }
+  .online-card-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    transition: transform var(--transition-slow);
+  }
+  .online-card:hover .online-card-img img { transform: scale(1.06); }
+
+  .online-card-body {
+    padding: var(--spacing-sm) var(--spacing-md) var(--spacing-sm) calc(var(--spacing-md) + 4px);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .online-card-top {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+  /* reuse .event-status-badge but not absolute here */
+  .online-card-top .event-status-badge {
+    position: static;
+  }
+  .online-card-title {
+    font-size: 0.98rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    line-height: 1.3;
+  }
+  .online-card-desc {
+    font-size: 0.83rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0;
+    flex: 1;
+  }
+
+  /* ── CTA Banner ── */
+  .cta-section {
+    background: linear-gradient(135deg, var(--primary) 0%, #8B0A28 100%);
+    padding: var(--spacing-2xl) 0;
+  }
+  .cta-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-lg);
+    flex-wrap: wrap;
+  }
+  .cta-text { flex: 1; min-width: 260px; }
+  .cta-text h2 {
+    font-size: clamp(1.3rem, 3vw, 1.9rem);
+    color: #fff;
+    margin-bottom: 0.5rem;
+  }
+  .cta-text p {
+    color: rgba(255,255,255,0.75);
+    font-size: 0.95rem;
+    line-height: 1.65;
+    margin: 0;
+  }
+  .cta-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+    flex-shrink: 0;
+  }
+  .btn-outline {
+    display: inline-block;
+    padding: 0.875rem 2rem;
+    border: 2px solid rgba(255,255,255,0.55);
+    border-radius: 50px;
+    color: rgba(255,255,255,0.9);
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    background: transparent;
+    text-align: center;
+  }
+  .btn-outline:hover {
+    background: rgba(255,255,255,0.12);
+    border-color: #fff;
+    color: #fff;
+    transform: translateY(-2px);
+  }
+
+  /* event card link wrapper */
+  .event-card-link {
+    display: contents;
+    text-decoration: none;
+  }
+  .event-card-link .event-card,
+  .event-card-link .online-card {
+    cursor: pointer;
+  }
+  @media (max-width: 1024px) {
+    .events-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .comm-hero { min-height: 420px; }
+    .comm-hero-content { padding-bottom: var(--spacing-xl); }
+    .comm-hero-content h1 { font-size: 1.9rem; }
+    .hero-stat-num { font-size: 1.4rem; }
+
+    .events-grid {
+      grid-template-columns: 1fr;
+    }
+    .online-grid {
+      grid-template-columns: 1fr;
+    }
+    .online-card {
+      grid-template-columns: 110px 1fr;
+    }
+
+    .cta-inner {
+      flex-direction: column;
+      text-align: center;
+    }
+    .cta-actions {
+      justify-content: center;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .online-card {
+      grid-template-columns: 1fr;
+    }
+    .online-card-img {
+      aspect-ratio: 16 / 7;
+      border-right: none;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .online-card-body {
+      padding: var(--spacing-sm) var(--spacing-sm) var(--spacing-sm) calc(var(--spacing-sm) + 4px);
+    }
+  }
+</style>

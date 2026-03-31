@@ -1,0 +1,170 @@
+---
+interface Props {
+  horse: {
+    name: string;
+    slug: string;
+    image: string;
+    breed: string;
+    age: number;
+    wins: number;
+    description: string;
+    featured?: boolean;
+  };
+}
+
+const { horse } = Astro.props;
+---
+
+<article class="horse-card">
+  <a href={`/horses/${horse.slug}`} class="card-link">
+    <div class="card-image">
+      <img src={horse.image} alt={horse.name} loading="lazy" />
+      {horse.featured && (
+        <div class="badge-featured">⭐ Featured</div>
+      )}
+    </div>
+    
+    <div class="card-body">
+      <h3 class="card-title">{horse.name}</h3>
+      <p class="card-breed">{horse.breed}</p>
+      <p class="card-description">{horse.description}</p>
+      
+      <div class="card-stats">
+        <div class="stat">
+          <span class="stat-label">Umur</span>
+          <span class="stat-value">{horse.age} tahun</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Menang</span>
+          <span class="stat-value">{horse.wins}x</span>
+        </div>
+      </div>
+    </div>
+  </a>
+</article>
+
+<style>
+  .horse-card {
+    height: 100%;
+  }
+  
+  .card-link {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    color: inherit;
+    text-decoration: none;
+  }
+  
+  .card-image {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    border-radius: 16px 16px 0 0;
+    background: linear-gradient(135deg, #FFF5F5 0%, #FFFAF0 100%);
+  }
+  
+  .card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition-slow);
+  }
+  
+  .horse-card:hover .card-image img {
+    transform: scale(1.12) rotate(2deg);
+    filter: brightness(1.1);
+  }
+  
+  .badge-featured {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    background: #FFD700;
+    color: #1A1A1A;
+    padding: 0.3rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    z-index: 10;
+  }
+  
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+  
+  .card-body {
+    padding: 1.25rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-card);
+    border: 2px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 16px 16px;
+    transition: all var(--transition-medium);
+    position: relative;
+  }
+  
+  .horse-card:hover .card-body {
+    border-color: var(--primary);
+  }
+  
+  .card-title {
+    font-size: 1.375rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+    color: var(--text-primary);
+  }
+  
+  .card-breed {
+    font-size: 0.875rem;
+    background: linear-gradient(135deg, var(--accent), var(--accent-orange));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
+    margin-bottom: var(--spacing-sm);
+    letter-spacing: 0.5px;
+  }
+  
+  .card-description {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: var(--spacing-md);
+    flex: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .card-stats {
+    display: flex;
+    gap: var(--spacing-md);
+    padding-top: var(--spacing-sm);
+    border-top: 1px solid var(--border);
+  }
+  
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .stat-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .stat-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary);
+  }
+</style>
