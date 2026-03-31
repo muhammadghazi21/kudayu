@@ -1,21 +1,23 @@
 ---
+import { asset, link } from '@/utils/asset';
+
 const currentYear = new Date().getFullYear();
 
 const footerLinks = {
   'Informasi': [
-    { name: 'Tentang Kami', href: '/about' },
-    { name: 'Kontak', href: '/contact' },
-    { name: 'FAQ', href: '/faq' },
+    { name: 'Tentang Kami', href: link('/about') },
+    { name: 'Kontak', href: link('/contact') },
+    { name: 'FAQ', href: link('/faq') },
   ],
   'Konten': [
-    { name: 'Profil Kuda', href: '/horses' },
-    { name: 'Jadwal Race', href: '/races' },
-    { name: 'Berita', href: '/news' },
-    { name: 'Galeri', href: '/gallery' },
+    { name: 'Profil Kuda', href: link('/horses') },
+    { name: 'Jadwal Race', href: link('/races') },
+    { name: 'Berita', href: link('/news') },
+    { name: 'Galeri', href: link('/gallery') },
   ],
   'Legal': [
-    { name: 'Privacy Policy', href: '/privacy' },
-    { name: 'Terms of Service', href: '/terms' },
+    { name: 'Privacy Policy', href: link('/privacy') },
+    { name: 'Terms of Service', href: link('/terms') },
   ],
 };
 
@@ -31,7 +33,7 @@ const socialLinks = [
   <div class="container">
     <div class="footer-content">
       <div class="footer-brand">
-        <a href="/" class="footer-logo">
+        <a href={link('/')} class="footer-logo">
           <span class="logo-icon">🐴</span>
           <span class="logo-text">KUDAYU</span>
         </a>

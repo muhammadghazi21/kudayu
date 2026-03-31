@@ -1,5 +1,5 @@
 ---
-import { asset } from '@/utils/asset';
+import { asset, link } from '@/utils/asset';
 interface Props {
   horse: {
     name: string;
@@ -17,7 +17,7 @@ const { horse } = Astro.props;
 ---
 
 <article class="horse-card">
-  <a href={`/horses/${horse.slug}`} class="card-link">
+  <a href={link(`/horses/${horse.slug}`)} class="card-link">
     <div class="card-image">
       <img src={asset(horse.image)} alt={horse.name} loading="lazy" />
       {horse.featured && (

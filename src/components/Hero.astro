@@ -1,4 +1,6 @@
 ---
+import { link } from '@/utils/asset';
+
 interface Props {
   title: string;
   subtitle: string;
@@ -12,7 +14,7 @@ const {
   subtitle, 
   image,
   ctaText = 'Jelajahi Sekarang',
-  ctaLink = '/horses'
+  ctaLink = link('/horses')
 } = Astro.props;
 ---
 
@@ -32,7 +34,7 @@ const {
     <p class="hero-subtitle fade-in">{subtitle}</p>
     <div class="hero-cta fade-in">
       <a href={ctaLink} class="btn btn-primary">{ctaText}</a>
-      <a href="/races" class="btn btn-secondary">Jadwal Race</a>
+      <a href={link('/races')} class="btn btn-secondary">Jadwal Race</a>
     </div>
   </div>
   

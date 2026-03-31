@@ -5,3 +5,10 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
  */
 export const asset = (path: string): string =>
   `${base}${path.startsWith('/') ? path : '/' + path}`;
+
+/** Prefix an internal link with the site base URL.
+ *  e.g. link('/horses') → '/kudayu/horses'
+ */
+export const link = (path: string): string =>
+  path === '/' ? `${base}/` : `${base}${path.startsWith('/') ? path : '/' + path}`;
+

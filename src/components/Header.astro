@@ -1,11 +1,13 @@
 ---
+import { link } from '@/utils/asset';
+
 const navItems = [
-  { name: 'Beranda', href: '/' },
-  { name: 'Kuda', href: '/horses' },
-  { name: 'Races', href: '/races' },
-  { name: 'Berita', href: '/news' },
-  { name: 'Galeri', href: '/gallery' },
-  { name: 'Komunitas', href: '/community' },
+  { name: 'Beranda', href: link('/') },
+  { name: 'Kuda', href: link('/horses') },
+  { name: 'Races', href: link('/races') },
+  { name: 'Berita', href: link('/news') },
+  { name: 'Galeri', href: link('/gallery') },
+  { name: 'Komunitas', href: link('/community') },
 ];
 
 const currentPath = Astro.url.pathname;
@@ -13,7 +15,7 @@ const currentPath = Astro.url.pathname;
 
 <header class="header">
   <nav class="nav container">
-    <a href="/" class="logo">
+    <a href={link('/')} class="logo">
       <span class="logo-icon">🐴</span>
       <span class="logo-text">KUDAYU</span>
     </a>

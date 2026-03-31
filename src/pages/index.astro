@@ -9,7 +9,7 @@ import { getFeaturedHorses, getTopWinners } from '@/data/horses';
 import { getUpcomingRaces, getFinishedRaces } from '@/data/races';
 import { getFeaturedNews } from '@/data/news';
 import { getHomePreviews } from '@/data/community';
-import { asset } from '@/utils/asset';
+import { asset, link } from '@/utils/asset';
 
 const featuredHorses = getFeaturedHorses();
 const topWinners = getTopWinners(3);
@@ -76,10 +76,10 @@ const totalEvents   = (await import('@/data/community')).communityEvents.length;
             >Platform informasi pacuan kuda Indonesia — dari profil kuda unggulan &amp; jadwal race nasional hingga event komunitas penggemar Uma Musume. Satu tempat untuk semua yang kamu butuhkan tentang dunia pacuan kuda.</p
           >
           <div class="about-strip-links">
-            <a href="/horses" class="about-link">Profil Kuda</a>
-            <a href="/races" class="about-link">Jadwal Race</a>
-            <a href="/community" class="about-link">Komunitas</a>
-            <a href="/gallery" class="about-link">Galeri</a>
+            <a href={link('/horses')} class="about-link">Profil Kuda</a>
+            <a href={link('/races')} class="about-link">Jadwal Race</a>
+            <a href={link('/community')} class="about-link">Komunitas</a>
+            <a href={link('/gallery')} class="about-link">Galeri</a>
           </div>
         </div>
         <div class="about-strip-visual">
@@ -98,7 +98,7 @@ const totalEvents   = (await import('@/data/community')).communityEvents.length;
         <h2 class="section-title">🏆 Kuda-Kuda Unggulan</h2>
         <div class="showcase-grid">
           {featuredHorses.map((horse, index) => (
-            <a href={`/horses/${horse.slug}`} class="showcase-item" data-index={index}>
+            <a href={link(`/horses/${horse.slug}`)} class="showcase-item" data-index={index}>
               <div class="showcase-image">
                 <img src={asset(horse.image)} alt={horse.name} loading="lazy" />
                 <div class="showcase-overlay"></div>
@@ -116,7 +116,7 @@ const totalEvents   = (await import('@/data/community')).communityEvents.length;
           ))}
         </div>
         <div class="text-center mt-3">
-          <a href="/horses" class="btn btn-primary btn-large">Jelajahi Semua Kuda →</a>
+          <a href={link('/horses')} class="btn btn-primary btn-large">Jelajahi Semua Kuda →</a>
         </div>
       </div>
     </section>
@@ -146,7 +146,7 @@ const totalEvents   = (await import('@/data/community')).communityEvents.length;
                     <span>📏 {race.distance}</span>
                     <span>📅 {new Date(race.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
                   </div>
-                  <a href={`/races#${race.id}`} class="race-card-cta">
+                  <a href={link(`/races#${race.id}`)} class="race-card-cta">
                     {race.status === 'finished' ? 'Lihat Hasil' : 'Detail Race'} <span>→</span>
                   </a>
                 </div>
@@ -170,7 +170,7 @@ const totalEvents   = (await import('@/data/community')).communityEvents.length;
           ))}
         </div>
         <div class="races-footer">
-          <a href="/races" class="btn btn-secondary">Lihat Semua Race →</a>
+          <a href={link('/races')} class="btn btn-secondary">Lihat Semua Race →</a>
         </div>
       </div>
     </section>
@@ -235,7 +235,7 @@ const totalEvents   = (await import('@/data/community')).communityEvents.length;
         <p class="section-subtitle">Event seru bagi para penggemar umamusume, cosplayer, dan wibu di Indonesia</p>
         <div class="community-events-grid">
           {communityEvents.map((ev) => (
-            <a href={`/community/${ev.slug}`} class="community-card-link">
+            <a href={link(`/community/${ev.slug}`)} class="community-card-link">
             <article class="community-card">
               <img src={asset(ev.image)} alt={ev.title} class="community-card-img" loading="lazy" />
               <div class="community-card-overlay">
@@ -252,7 +252,7 @@ const totalEvents   = (await import('@/data/community')).communityEvents.length;
           ))}
         </div>
         <div class="section-footer">
-          <a href="/community" class="btn btn-primary">Lihat Semua Event Komunitas →</a>
+          <a href={link('/community')} class="btn btn-primary">Lihat Semua Event Komunitas →</a>
         </div>
       </div>
     </section>
@@ -283,7 +283,7 @@ const totalEvents   = (await import('@/data/community')).communityEvents.length;
                       {(new Date(article.date).toLocaleDateString('id-ID', { month: 'short', day: 'numeric' }))}
                     </span>
                   </div>
-                  <a href={`/news/${article.slug}`} class="timeline-link">
+                  <a href={link(`/news/${article.slug}`)} class="timeline-link">
                     Baca Selengkapnya →
                   </a>
                 </div>
@@ -292,7 +292,7 @@ const totalEvents   = (await import('@/data/community')).communityEvents.length;
           ))}
         </div>
         <div class="text-center mt-3">
-          <a href="/news" class="btn btn-secondary btn-large">Lihat Semua Berita →</a>
+          <a href={link('/news')} class="btn btn-secondary btn-large">Lihat Semua Berita →</a>
         </div>
       </div>
     </section>
@@ -303,7 +303,7 @@ const totalEvents   = (await import('@/data/community')).communityEvents.length;
         <h2 class="section-title">🏅 Top Winners Leaderboard</h2>
         <div class="podium">
           {topWinners.map((horse, index) => (
-            <a href={`/horses/${horse.slug}`} class="podium-item" data-rank={index + 1}>
+            <a href={link(`/horses/${horse.slug}`)} class="podium-item" data-rank={index + 1}>
               <div class="podium-rank">
                 <span class="rank-number">#{index + 1}</span>
                 {index === 0 && <span class="crown">👑</span>}
@@ -323,7 +323,7 @@ const totalEvents   = (await import('@/data/community')).communityEvents.length;
           ))}
         </div>
         <div class="section-footer">
-          <a href="/horses" class="btn btn-secondary">Lihat Semua Kuda →</a>
+          <a href={link('/horses')} class="btn btn-secondary">Lihat Semua Kuda →</a>
         </div>
       </div>
     </section>

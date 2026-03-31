@@ -3,7 +3,7 @@ import Layout from '@/layouts/Layout.astro';
 import Header from '@/components/Header.astro';
 import Footer from '@/components/Footer.astro';
 import { horses, getHorseBySlug } from '@/data/horses';
-import { asset } from '@/utils/asset';
+import { asset, link } from '@/utils/asset';
 
 export async function getStaticPaths() {
   return horses.map(horse => ({
@@ -35,7 +35,7 @@ if (!horse) {
       </div>
       <div class="container">
         <div class="horse-hero-content">
-          <a href="/horses" class="hero-back-link">← Semua Kuda Pacu</a>
+          <a href={link('/horses')} class="hero-back-link">← Semua Kuda Pacu</a>
           <div class="hero-badges">
             <span class="hero-badge badge-breed">{horse.breed}</span>
             <span class="hero-badge badge-province">📍 {horse.province}</span>
@@ -179,7 +179,7 @@ if (!horse) {
               </div>
             </div>
             
-            <a href="/horses" class="btn btn-secondary back-btn">← Kembali ke Daftar</a>
+            <a href={link('/horses')} class="btn btn-secondary back-btn">← Kembali ke Daftar</a>
           </aside>
         </div>
       </div>

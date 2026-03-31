@@ -3,6 +3,7 @@ import Layout from '@/layouts/Layout.astro';
 import Header from '@/components/Header.astro';
 import Footer from '@/components/Footer.astro';
 import { communityEvents, getEventBySlug } from '@/data/community';
+import { asset, link } from '@/utils/asset';
 import type { GetStaticPaths } from 'astro';
 
 export const getStaticPaths: GetStaticPaths = () =>
@@ -51,10 +52,10 @@ if (details.schedule) {
   <main>
     <!-- ── Hero ── -->
     <div class="detail-hero">
-      <img src={event.image} alt={event.title} class="hero-img" />
+      <img src={asset(event.image)} alt={event.title} class="hero-img" />
       <div class="hero-overlay"></div>
       <div class="container hero-content">
-        <a href="/community" class="back-link">← Kembali ke Komunitas</a>
+        <a href={link('/community')} class="back-link">← Kembali ke Komunitas</a>
         <div class="hero-badges">
           <span class="cat-badge" style={`background:${event.categoryColor}33;color:${event.categoryColor};border:1px solid ${event.categoryColor}55`}>
             {event.category}
@@ -278,8 +279,8 @@ if (details.schedule) {
               .filter((e) => e.slug !== event.slug)
               .slice(0, 4)
               .map((e) => (
-                <a href={`/community/${e.slug}`} class="other-event-item">
-                  <img src={e.image} alt={e.title} />
+                <a href={link(`/community/${e.slug}`)} class="other-event-item">
+                <img src={asset(e.image)} alt={e.title} />
                   <div>
                     <span class="other-event-cat" style={`color:${e.categoryColor}`}>{e.category}</span>
                     <span class="other-event-title">{e.title}</span>
